@@ -45,6 +45,9 @@ async def _create_collections():
     """Create collections if they don't exist"""
     try:
         db = get_db()
+        if not db:
+            logger.warning("[Database] Database not available, skipping collection creation")
+            return
         
         # Get existing collections
         existing_collections = await db.list_collection_names()
@@ -76,6 +79,9 @@ async def _create_indexes():
     """Create database indexes for efficient queries"""
     try:
         db = get_db()
+        if not db:
+            logger.warning("[Database] Database not available, skipping index creation")
+            return
         
         logger.info(f"[Database] Creating indexes...")
         
@@ -140,12 +146,6 @@ async def close_db():
 
 
 def get_db():
-    """Get database instance"""
-    if _db is None:
-        raise RuntimeError(
-            "Database not initialized. "
-            "Call init_db() during application startup. "
-            "Ensure MongoDB is running on localhost:27017"
-        )
+    """Get database instance - returns None if not initialized"""
     return _db
 
