@@ -1,0 +1,115 @@
+═══════════════════════════════════════════════════════════════
+UI IMPROVEMENTS & BRANDING - QUICK GUIDE
+═══════════════════════════════════════════════════════════════
+
+1. LOGOUT BUTTON (Top-Right)
+─────────────────────────────────────────────────────────────
+   Location: Top-right corner of dashboard
+   Style: Red button with LogOut icon
+   Text: "Logout" (shows icon only on mobile)
+   Position: Always visible when logged in
+   Action: Click to logout (redirects to home)
+
+   Visual:
+   ┌─────────────────────────────────────────┐
+   │ ... Session Info ... [🚪 Logout]       │ ← Here!
+   └─────────────────────────────────────────┘
+
+2. USER INFORMATION (Bottom-Left Sidebar)
+─────────────────────────────────────────────────────────────
+   Location: Bottom of left sidebar
+   Shows: User's email address
+   Avatar: First letter of email in circle
+   Plan: "Free Plan" status
+   Updates: Dynamically based on logged-in user
+
+   Visual:
+   ┌──────────────────┐
+   │ [R] email@ex.com │ ← Shows your email
+   │     Free Plan    │ ← Shows plan type
+   └──────────────────┘
+
+3. BRANDING UPDATE
+─────────────────────────────────────────────────────────────
+   Changed: RagaRasa → Raga-Rasa-Laya
+   
+   Updated In:
+   ✓ Sidebar title (left side, top)
+   ✓ Landing page main title (large heading)
+   ✓ Landing page footer text
+   ✓ All references throughout app
+
+═══════════════════════════════════════════════════════════════
+HOW TO TEST
+═══════════════════════════════════════════════════════════════
+
+Step 1: Login
+─────────────
+1. Go to http://localhost:5174
+2. Click "Login"
+3. Email: rishisingh9152@gmail.com
+4. Password: Ripra@2622
+5. Click "Login"
+
+Step 2: See Logout Button
+─────────────────────────
+1. After login, look TOP-RIGHT of page
+2. Should see red "Logout" button
+3. Next to session status and avatar
+
+Step 3: See User Information
+────────────────────────────
+1. Look at BOTTOM-LEFT of sidebar
+2. Should see your email address
+3. Avatar shows first letter of email
+4. "Free Plan" status below
+
+Step 4: Check Branding
+──────────────────────
+1. In sidebar title (top-left): "Raga-Rasa-Laya"
+2. Click home to see landing page
+3. Main title: "Raga-Rasa-Laya"
+4. Footer: "Raga-Rasa-Laya — Where..."
+
+Step 5: Test Logout
+───────────────────
+1. From dashboard, click red "Logout" button
+2. Should be redirected to home page
+3. Logout button disappears
+4. See "Login" and "Register" buttons instead
+
+═══════════════════════════════════════════════════════════════
+FILES CHANGED
+═══════════════════════════════════════════════════════════════
+
+DashboardTopbar.tsx
+  - Added logout button with click handler
+  - Styled with red background
+  - Shows LogOut icon from lucide-react
+  - Redirects to home on click
+
+DashboardSidebar.tsx
+  - Added useAuth hook to get user info
+  - Display user email dynamically
+  - Avatar shows first letter of email
+  - Changed "RagaRasa" to "Raga-Rasa-Laya"
+
+Landing.tsx
+  - Changed all "RagaRasa" to "Raga-Rasa-Laya"
+  - In navigation bar
+  - In main title
+  - In footer text
+
+═══════════════════════════════════════════════════════════════
+GIT COMMIT
+═══════════════════════════════════════════════════════════════
+
+Commit ID: 202387b
+Message: "Add logout button to dashboard topbar and update branding"
+
+Changes:
+- 3 files modified
+- 26 insertions
+- 7 deletions
+
+═══════════════════════════════════════════════════════════════
