@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - MONGODB_URL=mongodb://localhost:27017
+      - REDIS_URL=redis://localhost:6379
+      - EMOTION_SERVICE_URL=https://raga-rasa-music.onrender.com
+      - JWT_SECRET=dt_aRvdBIakTz2GI_qC4U1EqVVgmq4nrRDSc5XX73iY
+      - DATABASE_NAME=raga_rasa
+      - USE_EXTERNAL_EMOTION_SERVICE=true
+      - EMOTION_SERVICE_ENDPOINT=/detect
+      - DEBUG=false
+    volumes:
+      - ./Backend:/app
+      - /app/__pycache__
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - raga-rasa-network
+
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=raga_rasa
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - raga-rasa-network
+
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - raga-rasa-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  raga-rasa-network:
+    driver: bridge
