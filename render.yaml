@@ -8,16 +8,40 @@ services:
     envVars:
       - key: MONGODB_URL
         value: mongodb+srv://Rishi123:Rishi_123@majorproject.lpwzhzc.mongodb.net/?appName=MajorProject
-      - key: EMOTION_SERVICE_URL
-        value: https://raga-rasa-backend.onrender.com
-      - key: JWT_SECRET
-        value: dt_aRvdBIakTz2GI_qC4U1EqVVgmq4nrRDSc5XX73iY
       - key: DATABASE_NAME
         value: raga_rasa
-      - key: USE_EXTERNAL_EMOTION_SERVICE
-        value: "true"
+      - key: EMOTION_SERVICE_URL
+        value: https://raga-rasa-music.onrender.com
       - key: EMOTION_SERVICE_ENDPOINT
         value: /detect
+      - key: USE_EXTERNAL_EMOTION_SERVICE
+        value: "true"
+      - key: JWT_SECRET_KEY
+        value: dt_aRvdBIakTz2GI_qC4U1EqVVgmq4nrRDSc5XX73iY
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRATION_HOURS
+        value: "24"
+      - key: DEBUG
+        value: "false"
+      - key: ALLOWED_ORIGINS
+        value: https://raga-rasa-music-52.vercel.app,http://localhost:5173,http://localhost:3000
+      - key: REDIS_URL
+        value: redis://default:redis@localhost:6379/0
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: STORAGE_BASE_PATH
+        value: ./Songs/
+      - key: AUDIO_UPLOAD_DIR
+        value: ./audio
+      - key: MAX_AUDIO_SIZE_MB
+        value: "50"
+      - key: RASA_MODEL_PATH
+        value: ./models/rasa_classification/
+      - key: USE_RASA_MODEL
+        value: "true"
+      - key: EMOTION_CONFIDENCE_THRESHOLD
+        value: "0.3"
 
   - type: web
     name: raga-rasa-frontend
