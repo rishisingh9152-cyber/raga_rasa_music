@@ -31,10 +31,17 @@ class RasaClassificationModel:
             "Angry", "Disgusted", "Fearful", "Happy", 
             "Neutral", "Sad", "Surprised"
         ]
-        self._load_model()
+        self._model_loaded = False
+        # Don't load model in __init__ - do it lazily on first use
     
     def _load_model(self):
-        """Load model from disk"""
+        """Load model from disk (lazy load on first use)"""
+        # Prevent re-loading
+        if self._model_loaded:
+            return
+        
+        self._model_loaded = True
+        
         try:
             # Try loading Keras model first
             if MODEL_H5_PATH.exists():
@@ -113,6 +120,10 @@ class RasaClassificationModel:
         Returns:
             Dict with rasa prediction and confidence
         """
+        # Load model on first use if not already loaded
+        if not self._model_loaded:
+            self._load_model()
+        
         if self.model is None:
             logger.warning(f"Model not loaded, using fallback mapping for audio file")
             return self._fallback_emotion_to_rasa("Neutral")
@@ -194,6 +205,10 @@ class RasaClassificationModel:
         Returns:
             Dict with rasa prediction and confidence
         """
+        # Load model on first use if not already loaded
+        if not self._model_loaded:
+            self._load_model()
+        
         # This now just uses the fallback mapping directly
         logger.info(f"Using emotion-based fallback mapping for emotion: {emotion}")
         return self._fallback_emotion_to_rasa(emotion)
