@@ -4,8 +4,8 @@ FROM python:3.10.13-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies required for ML libraries
-RUN apt-get update && apt-get install -y \
+# Install minimal system dependencies required for ML libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     make \
@@ -14,16 +14,7 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libatlas-base-dev \
-    libjasper-dev \
-    libtiff5-dev \
-    libjasper1 \
-    libharfbuzz0b \
-    libwebp6 \
-    libtk8.6 \
-    libucl1 \
     curl \
-    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
