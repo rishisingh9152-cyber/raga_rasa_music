@@ -28,7 +28,11 @@ async def lifespan(app: FastAPI):
     initialize_directories()
     
     logger.info("Initializing database...")
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        logger.warning("Continuing without database - some features may not work")
     
     logger.info("Initializing Redis cache...")
     await init_redis()
@@ -38,7 +42,10 @@ async def lifespan(app: FastAPI):
     
     # Shutdown
     logger.info("Shutting down...")
-    await close_db()
+    try:
+        await close_db()
+    except Exception as e:
+        logger.error(f"Error during shutdown: {e}")
 
 
 app = FastAPI(
