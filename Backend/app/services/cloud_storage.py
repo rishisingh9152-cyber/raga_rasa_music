@@ -1,6 +1,6 @@
 """
 Cloud Storage Abstraction Layer
-Supports multiple storage providers: Local, Google Drive, AWS S3, Azure Blob
+Supports multiple storage providers: Local, Cloudinary, Google Drive, AWS S3, Azure Blob
 Provides a unified interface for all storage operations
 """
 
@@ -12,6 +12,15 @@ from typing import Optional, Dict, Any, BinaryIO
 from datetime import datetime, timedelta
 import hashlib
 from app.config import settings
+
+# Try to import cloudinary, but don't fail if not installed
+try:
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    CLOUDINARY_AVAILABLE = True
+except ImportError:
+    CLOUDINARY_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -300,6 +309,167 @@ class AzureBlobStorageProvider(StorageProvider):
         raise NotImplementedError("Azure file size not yet implemented")
 
 
+class CloudinaryStorageProvider(StorageProvider):
+    """Cloudinary cloud storage provider"""
+    
+    def __init__(self):
+        if not CLOUDINARY_AVAILABLE:
+            raise ImportError("cloudinary package required for Cloudinary storage. Install with: pip install cloudinary")
+        
+        self.cloud_name = settings.CLOUDINARY_CLOUD_NAME
+        self.api_key = settings.CLOUDINARY_API_KEY
+        self.api_secret = settings.CLOUDINARY_API_SECRET
+        
+        if not self.cloud_name or not self.api_key or not self.api_secret:
+            raise ValueError("Cloudinary configuration missing: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET required")
+        
+        # Initialize Cloudinary
+        cloudinary.config(
+            cloud_name=self.cloud_name,
+            api_key=self.api_key,
+            api_secret=self.api_secret
+        )
+        logger.info(f"Cloudinary storage initialized with cloud: {self.cloud_name}")
+    
+    async def upload_file(self, file_path: str, file_content: bytes, metadata: Dict[str, Any] = None) -> Dict[str, str]:
+        """Upload file to Cloudinary"""
+        try:
+            # Determine file type based on extension
+            file_name = Path(file_path).name
+            
+            # Upload to Cloudinary
+            result = cloudinary.uploader.upload(
+                file_content,
+                resource_type="auto",  # auto-detect audio/video/image
+                public_id=file_path.replace("/", "_").replace(".", "_"),
+                folder="raga-rasa/songs",
+                use_filename=True,
+                unique_filename=False,
+                overwrite=False
+            )
+            
+            logger.info(f"File uploaded to Cloudinary: {file_path}")
+            return {
+                "file_path": file_path,
+                "url": result["secure_url"],
+                "cloudinary_url": result["url"],
+                "public_id": result["public_id"],
+                "size": result.get("bytes", 0),
+                "hash": result.get("etag", "")
+            }
+        except Exception as e:
+            logger.error(f"Failed to upload file to Cloudinary: {e}")
+            raise
+    
+    async def download_file(self, file_path: str) -> bytes:
+        """Download file from Cloudinary (not typically used, use URL directly)"""
+        try:
+            import urllib.request
+            # Get the resource
+            resources = cloudinary.api.resources(
+                resource_type="auto",
+                max_results=1,
+                prefix=file_path
+            )
+            
+            if not resources.get("resources"):
+                raise FileNotFoundError(f"File not found on Cloudinary: {file_path}")
+            
+            url = resources["resources"][0]["secure_url"]
+            with urllib.request.urlopen(url) as response:
+                return response.read()
+        except Exception as e:
+            logger.error(f"Failed to download file from Cloudinary: {e}")
+            raise
+    
+    async def delete_file(self, file_path: str) -> bool:
+        """Delete file from Cloudinary"""
+        try:
+            public_id = file_path.replace("/", "_").replace(".", "_")
+            result = cloudinary.uploader.destroy(
+                public_id,
+                resource_type="auto",
+                invalidate=True
+            )
+            
+            if result.get("result") == "ok":
+                logger.info(f"File deleted from Cloudinary: {file_path}")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Failed to delete file from Cloudinary: {e}")
+            raise
+    
+    async def list_files(self, folder_path: str = "") -> list:
+        """List files in Cloudinary folder"""
+        try:
+            prefix = f"raga-rasa/songs/{folder_path}".rstrip("/")
+            resources = cloudinary.api.resources(
+                resource_type="auto",
+                prefix=prefix,
+                max_results=100
+            )
+            
+            files = []
+            for resource in resources.get("resources", []):
+                files.append({
+                    "name": resource["public_id"].split("/")[-1],
+                    "path": resource["public_id"],
+                    "size": resource.get("bytes", 0),
+                    "modified": resource.get("created_at", ""),
+                    "url": resource.get("secure_url", "")
+                })
+            return files
+        except Exception as e:
+            logger.error(f"Failed to list files on Cloudinary: {e}")
+            return []
+    
+    async def get_download_url(self, file_path: str, expires_in_hours: int = 24) -> str:
+        """Get Cloudinary download URL (permanent secure URL)"""
+        try:
+            public_id = file_path.replace("/", "_").replace(".", "_")
+            url = cloudinary.utils.cloudinary_url(
+                public_id,
+                resource_type="auto",
+                secure=True
+            )[0]
+            return url
+        except Exception as e:
+            logger.error(f"Failed to get download URL from Cloudinary: {e}")
+            raise
+    
+    async def file_exists(self, file_path: str) -> bool:
+        """Check if file exists on Cloudinary"""
+        try:
+            public_id = file_path.replace("/", "_").replace(".", "_")
+            resources = cloudinary.api.resources(
+                resource_type="auto",
+                max_results=1,
+                prefix=public_id
+            )
+            return len(resources.get("resources", [])) > 0
+        except Exception as e:
+            logger.error(f"Failed to check file existence on Cloudinary: {e}")
+            return False
+    
+    async def get_file_size(self, file_path: str) -> int:
+        """Get file size from Cloudinary"""
+        try:
+            public_id = file_path.replace("/", "_").replace(".", "_")
+            resources = cloudinary.api.resources(
+                resource_type="auto",
+                max_results=1,
+                prefix=public_id
+            )
+            
+            if resources.get("resources"):
+                return resources["resources"][0].get("bytes", 0)
+            return 0
+        except Exception as e:
+            logger.error(f"Failed to get file size from Cloudinary: {e}")
+            return 0
+
+
 class StorageFactory:
     """Factory to create storage providers based on configuration"""
     
@@ -313,6 +483,8 @@ class StorageFactory:
             
             if provider_type == "local":
                 cls._provider_instance = LocalStorageProvider()
+            elif provider_type == "cloudinary":
+                cls._provider_instance = CloudinaryStorageProvider()
             elif provider_type == "google_drive":
                 cls._provider_instance = GoogleDriveStorageProvider()
             elif provider_type == "aws_s3":

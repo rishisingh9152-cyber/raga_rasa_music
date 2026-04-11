@@ -57,13 +57,24 @@ class Settings(BaseSettings):
     ALLOWED_HEADERS: list = ["Content-Type", "Authorization"]
     
     # Storage Configuration
-    STORAGE_PROVIDER: str = "local"  # "local", "google_drive", "aws_s3", "azure_blob"
+    STORAGE_PROVIDER: str = "local"  # "local", "cloudinary", "google_drive", "aws_s3", "azure_blob"
     STORAGE_BASE_PATH: str = "./Songs/"
+    
+    # Cloudinary Configuration
+    CLOUDINARY_CLOUD_NAME: Optional[str] = None
+    CLOUDINARY_API_KEY: Optional[str] = None
+    CLOUDINARY_API_SECRET: Optional[str] = None
+    
+    # Google Drive Configuration
     GOOGLE_DRIVE_FOLDER_ID: Optional[str] = None
     GOOGLE_DRIVE_API_KEY: Optional[str] = None
     GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON: Optional[str] = None
+    
+    # AWS S3 Configuration
     AWS_S3_BUCKET: Optional[str] = None
     AWS_S3_REGION: Optional[str] = None
+    
+    # Azure Blob Configuration
     AZURE_BLOB_CONTAINER: Optional[str] = None
     AZURE_STORAGE_ACCOUNT: Optional[str] = None
     

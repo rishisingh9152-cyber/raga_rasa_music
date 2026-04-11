@@ -29,9 +29,15 @@ services:
       - key: REDIS_URL
         value: redis://default:redis@localhost:6379/0
       - key: STORAGE_PROVIDER
-        value: local
+        value: cloudinary
       - key: STORAGE_BASE_PATH
         value: ./Songs/
+      - key: CLOUDINARY_CLOUD_NAME
+        value: 
+      - key: CLOUDINARY_API_KEY
+        value: 
+      - key: CLOUDINARY_API_SECRET
+        value: 
       - key: AUDIO_UPLOAD_DIR
         value: ./audio
       - key: MAX_AUDIO_SIZE_MB
