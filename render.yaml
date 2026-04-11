@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: raga-rasa-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: free
+    envVars:
+      - key: MONGODB_URL
+        value: mongodb+srv://Rishi123:Rishi_123@majorproject.lpwzhzc.mongodb.net/?appName=MajorProject
+      - key: EMOTION_SERVICE_URL
+        value: https://raga-rasa-music.onrender.com
+      - key: JWT_SECRET
+        value: dt_aRvdBIakTz2GI_qC4U1EqVVgmq4nrRDSc5XX73iY
+      - key: DATABASE_NAME
+        value: raga_rasa
+      - key: USE_EXTERNAL_EMOTION_SERVICE
+        value: "true"
+      - key: EMOTION_SERVICE_ENDPOINT
+        value: /detect
