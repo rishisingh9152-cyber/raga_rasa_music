@@ -9,7 +9,7 @@ services:
       - key: MONGODB_URL
         value: mongodb+srv://Rishi123:Rishi_123@majorproject.lpwzhzc.mongodb.net/?appName=MajorProject
       - key: EMOTION_SERVICE_URL
-        value: https://raga-rasa-music.onrender.com
+        value: https://raga-rasa-backend.onrender.com
       - key: JWT_SECRET
         value: dt_aRvdBIakTz2GI_qC4U1EqVVgmq4nrRDSc5XX73iY
       - key: DATABASE_NAME
@@ -18,3 +18,14 @@ services:
         value: "true"
       - key: EMOTION_SERVICE_ENDPOINT
         value: /detect
+
+  - type: web
+    name: raga-rasa-frontend
+    runtime: docker
+    dockerfilePath: ./raga-rasa-soul-main/Dockerfile
+    region: oregon
+    plan: free
+    buildCommand: npm ci && npm run build
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://raga-rasa-backend.onrender.com
