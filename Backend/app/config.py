@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # Rasa Classification Model
     RASA_MODEL_PATH: str = "./models/rasa_classification/"
     USE_RASA_MODEL: bool = True
+    ALLOWED_RASAS: list = ["Shringar", "Veer", "Shaant", "Shok"]  # 4 core rasas for music therapy
     
     # Emotion Detection (Legacy - for fallback)
     EMOTION_MODEL: str = "fer"  # 'fer' or 'deepface'

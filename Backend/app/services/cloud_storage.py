@@ -310,7 +310,7 @@ class AzureBlobStorageProvider(StorageProvider):
 
 
 class CloudinaryStorageProvider(StorageProvider):
-    """Cloudinary cloud storage provider"""
+    """Cloudinary cloud storage provider with Rasa-based organization"""
     
     def __init__(self):
         if not CLOUDINARY_AVAILABLE:
@@ -319,6 +319,7 @@ class CloudinaryStorageProvider(StorageProvider):
         self.cloud_name = settings.CLOUDINARY_CLOUD_NAME
         self.api_key = settings.CLOUDINARY_API_KEY
         self.api_secret = settings.CLOUDINARY_API_SECRET
+        self.allowed_rasas = settings.ALLOWED_RASAS  # ["Shringar", "Veer", "Shaant", "Shok"]
         
         if not self.cloud_name or not self.api_key or not self.api_secret:
             raise ValueError("Cloudinary configuration missing: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET required")
@@ -330,32 +331,56 @@ class CloudinaryStorageProvider(StorageProvider):
             api_secret=self.api_secret
         )
         logger.info(f"Cloudinary storage initialized with cloud: {self.cloud_name}")
+        logger.info(f"Allowed Rasas: {self.allowed_rasas}")
+    
+    def _validate_rasa(self, rasa: str) -> bool:
+        """Validate if rasa is in allowed list"""
+        return rasa in self.allowed_rasas
+    
+    def _get_rasa_folder(self, rasa: str) -> str:
+        """Get the folder path for a rasa"""
+        if not self._validate_rasa(rasa):
+            raise ValueError(f"Invalid rasa: {rasa}. Allowed rasas: {self.allowed_rasas}")
+        return f"raga-rasa/songs/{rasa}"
     
     async def upload_file(self, file_path: str, file_content: bytes, metadata: Dict[str, Any] = None) -> Dict[str, str]:
-        """Upload file to Cloudinary"""
+        """Upload file to Cloudinary with Rasa-based folder structure"""
         try:
+            # Extract rasa from metadata
+            rasa = metadata.get("rasa") if metadata else None
+            if not rasa:
+                raise ValueError("Rasa is required for song upload. Allowed values: Shringar, Veer, Shaant, Shok")
+            
+            # Validate rasa
+            if not self._validate_rasa(rasa):
+                raise ValueError(f"Invalid rasa: {rasa}. Allowed values: {', '.join(self.allowed_rasas)}")
+            
             # Determine file type based on extension
             file_name = Path(file_path).name
+            rasa_folder = self._get_rasa_folder(rasa)
+            
+            # Create unique public_id for the file
+            public_id = f"{rasa_folder}/{Path(file_path).stem}"
             
             # Upload to Cloudinary
             result = cloudinary.uploader.upload(
                 file_content,
                 resource_type="auto",  # auto-detect audio/video/image
-                public_id=file_path.replace("/", "_").replace(".", "_"),
-                folder="raga-rasa/songs",
+                public_id=public_id,
                 use_filename=True,
                 unique_filename=False,
                 overwrite=False
             )
             
-            logger.info(f"File uploaded to Cloudinary: {file_path}")
+            logger.info(f"File uploaded to Cloudinary: {file_path} in rasa folder: {rasa}")
             return {
                 "file_path": file_path,
                 "url": result["secure_url"],
                 "cloudinary_url": result["url"],
                 "public_id": result["public_id"],
                 "size": result.get("bytes", 0),
-                "hash": result.get("etag", "")
+                "hash": result.get("etag", ""),
+                "rasa": rasa
             }
         except Exception as e:
             logger.error(f"Failed to upload file to Cloudinary: {e}")
@@ -401,9 +426,18 @@ class CloudinaryStorageProvider(StorageProvider):
             raise
     
     async def list_files(self, folder_path: str = "") -> list:
-        """List files in Cloudinary folder"""
+        """List files in Cloudinary folder (Rasa-based)"""
         try:
-            prefix = f"raga-rasa/songs/{folder_path}".rstrip("/")
+            # folder_path should be a rasa name like "Shringar", "Veer", etc.
+            if folder_path and not self._validate_rasa(folder_path):
+                logger.warning(f"Invalid rasa folder: {folder_path}. Using all rasas.")
+                folder_path = ""
+            
+            if folder_path:
+                prefix = f"raga-rasa/songs/{folder_path}"
+            else:
+                prefix = "raga-rasa/songs"
+            
             resources = cloudinary.api.resources(
                 resource_type="auto",
                 prefix=prefix,
@@ -412,12 +446,18 @@ class CloudinaryStorageProvider(StorageProvider):
             
             files = []
             for resource in resources.get("resources", []):
+                public_id = resource["public_id"]
+                # Extract rasa from path (e.g., "raga-rasa/songs/Shringar/song_name")
+                parts = public_id.split("/")
+                rasa = parts[2] if len(parts) >= 3 else "Unknown"
+                
                 files.append({
-                    "name": resource["public_id"].split("/")[-1],
-                    "path": resource["public_id"],
+                    "name": parts[-1] if len(parts) > 0 else resource["public_id"],
+                    "path": public_id,
                     "size": resource.get("bytes", 0),
                     "modified": resource.get("created_at", ""),
-                    "url": resource.get("secure_url", "")
+                    "url": resource.get("secure_url", ""),
+                    "rasa": rasa
                 })
             return files
         except Exception as e:

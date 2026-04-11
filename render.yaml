@@ -33,11 +33,11 @@ services:
       - key: STORAGE_BASE_PATH
         value: ./Songs/
       - key: CLOUDINARY_CLOUD_NAME
-        value: 
+        value: dlx3ufj3t
       - key: CLOUDINARY_API_KEY
-        value: 
+        value: "255318353319693"
       - key: CLOUDINARY_API_SECRET
-        value: 
+        value: MKFvdiyfmNpzxbaGKBMFM6SlT2c
       - key: AUDIO_UPLOAD_DIR
         value: ./audio
       - key: MAX_AUDIO_SIZE_MB
