@@ -1,0 +1,52 @@
+import os
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/')
+def home():
+    return jsonify({
+        "service": "Emotion Recognition API",
+        "status": "running",
+        "version": "1.0.0",
+        "endpoints": {
+            "GET /": "Service info",
+            "GET /health": "Health check",
+            "POST /detect": "Detect emotion from image"
+        }
+    })
+
+@app.route('/health')
+def health():
+    return jsonify({
+        "status": "ok",
+        "service": "emotion-recognition"
+    })
+
+@app.route('/detect', methods=['POST'])
+def detect():
+    """Detect emotion from base64 image"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'image' not in data:
+            return jsonify({"error": "Missing 'image' field in request"}), 400
+        
+        # For now, return a sample emotion
+        # In production, this would use HSEmotion model
+        return jsonify({
+            "emotion": "happy",
+            "confidence": 0.95,
+            "dominant": "happy",
+            "raw_dominant": "happy"
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('DEBUG', 'False') == 'True'
+    app.run(host='0.0.0.0', port=port, debug=debug)
