@@ -38,7 +38,8 @@ async def init_db():
     except Exception as e:
         logger.error(f"[Database] Failed to connect to MongoDB: {str(e)}")
         logger.error(f"[Database] Traceback: {traceback.format_exc()}")
-        raise
+        logger.warning("[Database] Continuing without database - some features may not work")
+        _db = None
 
 
 async def _create_collections():
