@@ -78,7 +78,6 @@ async def register(request: RegisterSchema):
 
 
 @router.post("/auth/login", response_model=TokenSchema)
-@limiter.limit(AUTH_RATE_LIMIT)
 async def login(request: LoginSchema):
     """
     Login with email and password.
