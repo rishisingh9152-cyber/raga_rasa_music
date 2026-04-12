@@ -6,10 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SessionProvider } from "@/context/SessionContext";
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import PublicRoute from "@/components/PublicRoute";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import DashboardLayout from "./pages/DashboardLayout";
 import DashboardHome from "./pages/DashboardHome";
@@ -30,9 +26,8 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-              <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+              {/* Auto-redirect to dashboard on app load */}
+              <Route path="/" element={<Navigate to="/dashboard/home" replace />} />
               
               {/* Protected dashboard routes */}
               <Route
