@@ -97,8 +97,8 @@ async def get_ragas_list(rasa: Optional[str] = None):
         return raga_list
         
     except Exception as e:
-        logger.error(f"Failed to fetch ragas list: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch ragas list")
+        logger.error(f"Failed to fetch ragas list: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch ragas list: {str(e)}")
 
 
 @router.get("/ragas/{raga_id}", response_model=RagaSchema)

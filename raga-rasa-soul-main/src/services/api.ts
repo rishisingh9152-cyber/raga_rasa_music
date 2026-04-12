@@ -194,3 +194,68 @@ export async function rateSong(
     throw new Error("Failed to submit rating");
   }
 }
+
+// ============================================================================
+// 6. GET SONGS BY RASA
+// ============================================================================
+
+export async function getSongsByRasa(): Promise<{ [key: string]: Song[] }> {
+  try {
+    console.log(`[API] Fetching songs by rasa from: ${API_BASE_URL}/songs/by-rasa`);
+    
+    const response = await fetch(`${API_BASE_URL}/songs/by-rasa`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(`[API] Received songs organized by rasa:`, Object.keys(data));
+    return data;
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.error(`[API] getSongsByRasa error: ${errorMsg}`);
+    throw new Error(`Failed to fetch songs: ${errorMsg}`);
+  }
+}
+
+// ============================================================================
+// 7. SUBMIT SONG RATING (Simple)
+// ============================================================================
+
+export async function submitSongRating(
+  song_id: string,
+  song_title: string,
+  rasa: string,
+  rating: number,
+  comments?: string
+): Promise<void> {
+  try {
+    console.log(`[API] Submitting rating for song: ${song_title}`);
+    
+    const response = await fetch(`${API_BASE_URL}/rate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        song_id,
+        song_title,
+        rasa,
+        rating,
+        comments: comments || ""
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    console.log(`[API] Rating submitted successfully for: ${song_title}`);
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.error(`[API] submitSongRating error: ${errorMsg}`);
+    throw new Error(`Failed to submit rating: ${errorMsg}`);
+  }
+}

@@ -1,15 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, SkipBack, SkipForward, Music, Star, X, ChevronDown } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Music, Star, X } from "lucide-react";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { getSongsByRasa, submitSongRating } from "@/services/api";
 
 interface Song {
-  _id: string;
+  _id?: string;
+  song_id?: string;
   title: string;
-  filename: string;
   audio_url: string;
-  duration: string;
+  duration?: number;
   rasa: string;
+  artist?: string;
+  confidence?: number;
 }
 
 interface SongsByRasa {
@@ -26,19 +29,32 @@ const RASA_MAP: { [key: string]: string } = {
 const SONGS_PER_PAGE = 15;
 
 const MusicPlayer = () => {
-   const [songsByRasa, setSongsByRasa] = useState<SongsByRasa>({});
-    const [filter, setFilter] = useState("All");
-    const [currentSong, setCurrentSong] = useState<Song | null>(null);
-    const [playing, setPlaying] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [showRatingModal, setShowRatingModal] = useState(false);
-    const [rating, setRating] = useState(0);
-    const [comments, setComments] = useState("");
-    const [submittingRating, setSubmittingRating] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [recommendedSongIds, setRecommendedSongIds] = useState<Set<string>>(new Set());
-    const audioRef = useRef<HTMLAudioElement>(null);
+  const [songsByRasa, setSongsByRasa] = useState<SongsByRasa>({});
+  const [filter, setFilter] = useState("All");
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comments, setComments] = useState("");
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [recommendedSongIds, setRecommendedSongIds] = useState<Set<string>>(new Set());
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Helper function to get song ID (handle both _id and song_id)
+  const getSongId = (song: Song): string => {
+    return song._id || song.song_id || "";
+  };
+
+  // Helper function to format duration
+  const getDurationString = (duration?: number): string => {
+    if (!duration) return "--:--";
+    const minutes = Math.floor(duration / 60);
+    const seconds = Math.floor(duration % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
 
   // Fetch songs from backend API
   useEffect(() => {
@@ -46,24 +62,20 @@ const MusicPlayer = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch("/api/songs/by-rasa");
-        if (!response.ok) {
-          throw new Error(`Backend returned ${response.status}: ${response.statusText}`);
-        }
-        const data = await response.json();
-         console.log("API Response keys:", Object.keys(data));
-         console.log("Song counts:", {
-           Shaant: data.Shaant?.length || 0,
-           Shringar: data.Shringar?.length || 0,
-           Veer: data.Veer?.length || 0,
-           Shok: data.Shok?.length || 0
-         });
-         setSongsByRasa(data);
+        const data = await getSongsByRasa();
+        console.log("Fetched songs by rasa:", Object.keys(data));
+        console.log("Song counts:", {
+          Shaant: data.Shaant?.length || 0,
+          Shringar: data.Shringar?.length || 0,
+          Veer: data.Veer?.length || 0,
+          Shok: data.Shok?.length || 0
+        });
+        setSongsByRasa(data);
       } catch (error) {
-         const errorMsg = error instanceof Error ? error.message : "Unknown error";
-         console.error("Error fetching songs:", errorMsg);
-         setError(`Failed to load songs: ${errorMsg}. Make sure the backend is running on http://localhost:8080`);
-         setSongsByRasa({});
+        const errorMsg = error instanceof Error ? error.message : "Unknown error";
+        console.error("Error fetching songs:", errorMsg);
+        setError(`Failed to load songs: ${errorMsg}`);
+        setSongsByRasa({});
       } finally {
         setLoading(false);
       }
@@ -81,7 +93,7 @@ const MusicPlayer = () => {
         if (sessionData) {
           const session = JSON.parse(sessionData);
           if (session.recommended_songs) {
-            const ids = new Set(session.recommended_songs.map((s: any) => s._id || s.id));
+            const ids = new Set(session.recommended_songs.map((s: any) => getSongId(s)));
             setRecommendedSongIds(ids);
           }
         }
@@ -93,70 +105,65 @@ const MusicPlayer = () => {
     checkRecommendations();
   }, []);
 
-    // Handle audio playback
-    useEffect(() => {
-      const audio = audioRef.current;
-      if (!audio || !currentSong) return;
+  // Handle audio playback
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentSong) return;
 
-      // Explicitly set the src before attempting to play
-      if (audio.src !== currentSong.audio_url) {
-        console.log('Setting audio src to:', currentSong.audio_url);
-        audio.src = currentSong.audio_url;
+    // Explicitly set the src before attempting to play
+    if (audio.src !== currentSong.audio_url) {
+      console.log('[Music] Setting audio src to:', currentSong.audio_url);
+      audio.src = currentSong.audio_url;
+    }
+
+    console.log('[Music] Playback state - playing:', playing, 'song:', currentSong.title);
+
+    if (playing) {
+      // Ensure the audio has loaded before trying to play
+      console.log('[Music] Attempting to play audio...');
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('[Music] Audio started playing successfully');
+          })
+          .catch(err => {
+            console.error("[Music] Play error:", err.name, err.message);
+            setPlaying(false);
+          });
       }
+    } else {
+      console.log('[Music] Pausing audio...');
+      audio.pause();
+    }
+  }, [playing, currentSong]);
 
-      console.log('Audio effect triggered - playing:', playing, 'song:', currentSong.title, 'src:', audio.src);
-      console.log('Audio element state:', {
-        src: audio.src,
-        currentTime: audio.currentTime,
-        duration: audio.duration,
-        readyState: audio.readyState,
-        networkState: audio.networkState,
-        paused: audio.paused
-      });
+  // Handle audio end
+  const handleAudioEnded = () => {
+    console.log('[Music] Song ended, playing next');
+    navigate(1);
+  };
 
-      if (playing) {
-        // Ensure the audio has loaded before trying to play
-        console.log('Attempting to play audio...');
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('Audio started playing successfully');
-            })
-            .catch(err => {
-              console.error("Play error:", err.name, err.message);
-            });
-        }
-      } else {
-        console.log('Pausing audio...');
-        audio.pause();
-      }
-    }, [playing, currentSong]);
+  const playSong = (song: Song) => {
+    // Always pause first when changing songs
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setCurrentSong(song);
+    setPlaying(true);
+    setRating(0);
+    setComments("");
+    console.log('[Music] Playing song:', song.title);
+  };
 
-   // Handle audio end
-   const handleAudioEnded = () => {
-     navigate(1);
-   };
+  const handlePlay = (song: Song) => {
+    playSong(song);
+  };
 
-     const playSong = (song: Song) => {
-       // Always pause first when changing songs
-       if (audioRef.current) {
-         audioRef.current.pause();
-         audioRef.current.currentTime = 0;
-       }
-       setCurrentSong(song);
-       setPlaying(true);
-       setRating(0);
-       setComments("");
-     };
-
-    const handlePlay = (song: Song) => {
-      playSong(song);
-    };
-
-    const handlePause = () => {
-      setPlaying(false);
-    };
+  const handlePause = () => {
+    setPlaying(false);
+  };
 
   const navigate = (dir: 1 | -1) => {
     if (!currentSong) return;
@@ -167,51 +174,48 @@ const MusicPlayer = () => {
 
     if (filteredSongs.length === 0) return;
 
-    const idx = filteredSongs.findIndex(s => s._id === currentSong._id);
+    const currentId = getSongId(currentSong);
+    const idx = filteredSongs.findIndex(s => getSongId(s) === currentId);
     const next = filteredSongs[(idx + dir + filteredSongs.length) % filteredSongs.length];
     playSong(next);
   };
 
-  const submitRating = async () => {
+  const submitRatingHandler = async () => {
     if (!currentSong || rating === 0) return;
 
     setSubmittingRating(true);
     try {
-      const response = await fetch("/api/rate-song", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          song_id: currentSong._id,
-          song_title: currentSong.title,
-          rasa: currentSong.rasa,
-          rating: rating,
-          comments: comments || undefined
-        })
-      });
-
-      if (!response.ok) throw new Error("Failed to submit rating");
+      await submitSongRating(
+        getSongId(currentSong),
+        currentSong.title,
+        currentSong.rasa,
+        rating,
+        comments
+      );
       
       setShowRatingModal(false);
       setRating(0);
       setComments("");
+      console.log('[Music] Rating submitted successfully');
     } catch (error) {
       console.error("Error submitting rating:", error);
+      // Still close modal but show error was logged
     } finally {
       setSubmittingRating(false);
     }
   };
 
-   // Sort and paginate songs
-   const allFilteredSongs = filter === "All" 
-     ? Object.values(songsByRasa).flat()
-     : songsByRasa[filter] || [];
+  // Sort and paginate songs
+  const allFilteredSongs = filter === "All" 
+    ? Object.values(songsByRasa).flat()
+    : songsByRasa[filter] || [];
 
-   console.log(`Filter: ${filter}, allFilteredSongs.length: ${allFilteredSongs.length}, songsByRasa keys:`, Object.keys(songsByRasa));
+  console.log(`Filter: ${filter}, filtered songs: ${allFilteredSongs.length}`);
 
   // Sort: recommended songs first, then by title
   const sortedSongs = [...allFilteredSongs].sort((a, b) => {
-    const aRecommended = recommendedSongIds.has(a._id);
-    const bRecommended = recommendedSongIds.has(b._id);
+    const aRecommended = recommendedSongIds.has(getSongId(a));
+    const bRecommended = recommendedSongIds.has(getSongId(b));
     if (aRecommended !== bRecommended) {
       return aRecommended ? -1 : 1;
     }
@@ -275,9 +279,6 @@ const MusicPlayer = () => {
         >
           <p className="font-semibold mb-2">Connection Error</p>
           <p>{error}</p>
-          <p className="text-xs mt-2 text-red-300">
-            To fix: Start the backend with <code className="bg-black/30 px-2 py-1 rounded">cd Backend && python main.py</code>
-          </p>
         </motion.div>
       )}
 
@@ -292,7 +293,7 @@ const MusicPlayer = () => {
             ) : (
               paginatedSongs.map((song, i) => (
                 <motion.div
-                  key={song._id}
+                  key={getSongId(song)}
                   layout
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -300,18 +301,18 @@ const MusicPlayer = () => {
                   transition={{ delay: i * 0.03, duration: 0.3 }}
                   onClick={() => playSong(song)}
                   className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl cursor-pointer transition-all duration-200 ${
-                    currentSong?._id === song._id ? "bg-primary/10 border border-primary/30" : "glass-card-hover"
+                    getSongId(currentSong) === getSongId(song) ? "bg-primary/10 border border-primary/30" : "glass-card-hover"
                   }`}
                 >
                   {/* Recommended badge */}
-                  {recommendedSongIds.has(song._id) && (
+                  {recommendedSongIds.has(getSongId(song)) && (
                     <div className="w-1 h-1 rounded-full bg-primary flex-shrink-0" title="Recommended" />
                   )}
                   
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    currentSong?._id === song._id ? "gradient-bg" : "bg-muted"
+                    getSongId(currentSong) === getSongId(song) ? "gradient-bg" : "bg-muted"
                   }`}>
-                    {currentSong?._id === song._id && playing ? (
+                    {getSongId(currentSong) === getSongId(song) && playing ? (
                       <Pause className="w-4 h-4 text-primary-foreground" />
                     ) : (
                       <Music className="w-4 h-4 text-muted-foreground" />
@@ -322,7 +323,7 @@ const MusicPlayer = () => {
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{song.rasa}</p>
                   </div>
                   <span className="text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full bg-primary/10 text-primary hidden sm:block">{song.rasa}</span>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground flex-shrink-0">{song.duration}</span>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex-shrink-0">{getDurationString(song.duration)}</span>
                 </motion.div>
               ))
             )}
@@ -353,43 +354,43 @@ const MusicPlayer = () => {
         </div>
       )}
 
-       {/* Hidden audio element */}
-       <audio
-         ref={audioRef}
-         onEnded={handleAudioEnded}
-         crossOrigin="anonymous"
-       />
-       {currentSong && console.log('Current song object:', currentSong)}
+      {/* Hidden audio element */}
+      <audio
+        ref={audioRef}
+        onEnded={handleAudioEnded}
+        crossOrigin="anonymous"
+      />
 
-        {/* Enhanced Audio Player */}
-        <AnimatePresence>
-          {currentSong && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 lg:left-64 p-3 sm:p-4 z-30"
-              style={{ pointerEvents: 'auto' }}
-            >
-              <AudioPlayer
-                song={currentSong ? {
-                  song_id: currentSong._id,
-                  title: currentSong.title,
-                  rasa: currentSong.rasa,
-                  audio_url: currentSong.audio_url
-                } : null}
-                isPlaying={playing}
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onNext={() => navigate(1)}
-                onPrevious={() => navigate(-1)}
-                onRate={() => setShowRatingModal(true)}
-                audioRef={audioRef}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Enhanced Audio Player */}
+      <AnimatePresence>
+        {currentSong && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 lg:left-64 p-3 sm:p-4 z-30"
+            style={{ pointerEvents: 'auto' }}
+          >
+            <AudioPlayer
+              song={currentSong ? {
+                song_id: getSongId(currentSong),
+                title: currentSong.title,
+                rasa: currentSong.rasa,
+                audio_url: currentSong.audio_url,
+                confidence: currentSong.confidence
+              } : null}
+              isPlaying={playing}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onNext={() => navigate(1)}
+              onPrevious={() => navigate(-1)}
+              onRate={() => setShowRatingModal(true)}
+              audioRef={audioRef}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Rating Modal */}
       <AnimatePresence>
@@ -448,7 +449,7 @@ const MusicPlayer = () => {
 
               {/* Submit button */}
               <button
-                onClick={submitRating}
+                onClick={submitRatingHandler}
                 disabled={rating === 0 || submittingRating}
                 className={`w-full py-2 rounded-lg font-medium transition-all ${
                   rating === 0 || submittingRating

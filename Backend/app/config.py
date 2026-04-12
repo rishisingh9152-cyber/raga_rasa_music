@@ -12,18 +12,18 @@ class Settings(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
     
-    # Database
-    MONGODB_URL: str = "mongodb://localhost:27017"
+    # Database - Production MongoDB Atlas
+    MONGODB_URL: str = "mongodb+srv://Rishi123:Rishi_123@majorproject.lpwzhzc.mongodb.net/?appName=MajorProject"
     DATABASE_NAME: str = "raga_rasa"
     
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379"
+    # Redis - Production Redis (optional, can be empty)
+    REDIS_URL: str = ""
     REDIS_CACHE_EXPIRY: int = 3600  # 1 hour
     
-    # External Emotion Recognition Service
+    # External Emotion Recognition Service - Will be set by environment variable
     USE_EXTERNAL_EMOTION_SERVICE: bool = True
-    EMOTION_SERVICE_URL: str = "https://raga-rasa-music.onrender.com"  # Emotion recognition service on Render
-    EMOTION_SERVICE_ENDPOINT: str = "/detect"  # Flask emotion service endpoint
+    EMOTION_SERVICE_URL: str = "https://raga-rasa-music.onrender.com"
+    EMOTION_SERVICE_ENDPOINT: str = "/detect"
     EMOTION_CONFIDENCE_THRESHOLD: float = 0.3
     
     # Rasa Classification Model
@@ -38,9 +38,9 @@ class Settings(BaseSettings):
     MAX_RECOMMENDATIONS: int = 5
     EMBEDDING_DIMENSION: int = 128
     
-    # Celery
-    CELERY_BROKER: str = "redis://localhost:6379"
-    CELERY_BACKEND: str = "redis://localhost:6379"
+    # Celery - Optional for production
+    CELERY_BROKER: str = ""
+    CELERY_BACKEND: str = ""
     
     # Audio
     AUDIO_UPLOAD_DIR: str = "./audio"
@@ -48,12 +48,12 @@ class Settings(BaseSettings):
     
     # Security & JWT
     DEBUG: bool = False
-    JWT_SECRET_KEY: str = "your-secret-key-change-this-in-production"  # Override in .env
+    JWT_SECRET_KEY: str = "dt_aRvdBIakTz2GI_qC4U1EqVVgmq4nrRDSc5XX73iY"  # Production key
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_HOURS: int = 24
     
-    # CORS Configuration - Parse from comma-separated env var
-    ALLOWED_ORIGINS_STR: str = "http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080,https://raga-rasa-music-52.vercel.app"
+    # CORS Configuration - Production frontend URLs
+    ALLOWED_ORIGINS_STR: str = "https://raga-rasa-music-52.vercel.app,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
     ALLOWED_METHODS: list = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     ALLOWED_HEADERS: list = ["Content-Type", "Authorization"]
     
@@ -64,14 +64,14 @@ class Settings(BaseSettings):
             return ["http://localhost:5173"]
         return [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
     
-    # Storage Configuration
-    STORAGE_PROVIDER: str = "local"  # "local", "cloudinary", "google_drive", "aws_s3", "azure_blob"
+    # Storage Configuration - Use Cloudinary for production
+    STORAGE_PROVIDER: str = "cloudinary"
     STORAGE_BASE_PATH: str = "./Songs/"
     
-    # Cloudinary Configuration
-    CLOUDINARY_CLOUD_NAME: Optional[str] = None
-    CLOUDINARY_API_KEY: Optional[str] = None
-    CLOUDINARY_API_SECRET: Optional[str] = None
+    # Cloudinary Configuration - Production
+    CLOUDINARY_CLOUD_NAME: Optional[str] = "dlx3ufj3t"
+    CLOUDINARY_API_KEY: Optional[str] = "255318353319693"
+    CLOUDINARY_API_SECRET: Optional[str] = "MKFvdiyfmNpzxbaGKBMFM6SlT2c"
     
     # Google Drive Configuration
     GOOGLE_DRIVE_FOLDER_ID: Optional[str] = None
