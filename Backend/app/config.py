@@ -52,17 +52,17 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_HOURS: int = 24
     
-    # CORS Configuration
-    ALLOWED_ORIGINS: list = [
-        "http://localhost:5173",
-        "http://localhost:8080",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:8080",
-        "https://raga-rasa-music-52.vercel.app",
-        "https://raga-rasa-music-52.vercel.app/"
-    ]
+    # CORS Configuration - Parse from comma-separated env var
+    ALLOWED_ORIGINS_STR: str = "http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080,https://raga-rasa-music-52.vercel.app"
     ALLOWED_METHODS: list = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     ALLOWED_HEADERS: list = ["Content-Type", "Authorization"]
+    
+    @property
+    def ALLOWED_ORIGINS(self) -> list:
+        """Parse ALLOWED_ORIGINS from comma-separated string"""
+        if not self.ALLOWED_ORIGINS_STR:
+            return ["http://localhost:5173"]
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
     
     # Storage Configuration
     STORAGE_PROVIDER: str = "local"  # "local", "cloudinary", "google_drive", "aws_s3", "azure_blob"
