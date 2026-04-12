@@ -107,7 +107,7 @@ async def db_test():
     from app.database import get_db
     try:
         db = get_db()
-        if not db:
+        if db is None:
             logger.error("[DBTest] Database is None - not initialized")
             return {"status": "error", "message": "Database not initialized", "initialized": False}
         
