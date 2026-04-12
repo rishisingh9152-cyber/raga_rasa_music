@@ -211,9 +211,15 @@ const MusicPlayer = () => {
     : songsByRasa[filter] || [];
 
   console.log(`Filter: ${filter}, filtered songs: ${allFilteredSongs.length}`);
+  
+  // Safety check: filter out any songs without titles
+  const validSongs = allFilteredSongs.filter(song => song && song.title);
+  if (validSongs.length < allFilteredSongs.length) {
+    console.warn(`[MusicPlayer] Filtered out ${allFilteredSongs.length - validSongs.length} songs without titles`);
+  }
 
   // Sort: recommended songs first, then by title
-  const sortedSongs = [...allFilteredSongs].sort((a, b) => {
+  const sortedSongs = [...validSongs].sort((a, b) => {
     const aRecommended = recommendedSongIds.has(getSongId(a));
     const bRecommended = recommendedSongIds.has(getSongId(b));
     if (aRecommended !== bRecommended) {

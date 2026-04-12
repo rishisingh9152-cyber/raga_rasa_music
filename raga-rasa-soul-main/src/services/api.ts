@@ -213,11 +213,20 @@ export async function getSongsByRasa(): Promise<{ [key: string]: Song[] }> {
     }
 
     const data = await response.json();
-    console.log(`[API] Received songs organized by rasa:`, Object.keys(data));
+    console.log(`[API] Received response with keys:`, Object.keys(data));
     
     // Extract the by_rasa object from the response
+    // The backend returns { songs: [...], by_rasa: { Shaant: [...], ... }, total: N }
+    // We need to extract just the by_rasa part for the frontend
     const songsByRasa = data.by_rasa || data;
-    console.log(`[API] Songs organized by rasa:`, Object.keys(songsByRasa));
+    console.log(`[API] Extracted songs by rasa - keys:`, Object.keys(songsByRasa));
+    
+    // Validate that we have proper structure
+    if (!songsByRasa || Object.keys(songsByRasa).length === 0) {
+      console.warn(`[API] Warning: songsByRasa is empty`);
+      return {};
+    }
+    
     return songsByRasa;
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
