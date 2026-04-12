@@ -22,8 +22,8 @@ class Settings(BaseSettings):
     
     # External Emotion Recognition Service
     USE_EXTERNAL_EMOTION_SERVICE: bool = True
-    EMOTION_SERVICE_URL: str = "http://localhost:5000"  # Change to your service URL/port
-    EMOTION_SERVICE_ENDPOINT: str = "/detect"  # Change to your service endpoint (Flask uses /detect)
+    EMOTION_SERVICE_URL: str = "https://raga-rasa-music.onrender.com"  # Emotion recognition service on Render
+    EMOTION_SERVICE_ENDPOINT: str = "/detect"  # Flask emotion service endpoint
     EMOTION_CONFIDENCE_THRESHOLD: float = 0.3
     
     # Rasa Classification Model
