@@ -61,21 +61,33 @@ async def get_ragas_list(rasa: Optional[str] = None):
         # Convert to response schema with proper URLs
         raga_list = []
         for raga in ragas:
-            # Generate proper URL based on storage type
-            audio_url = await _get_song_url(raga)
-            
-            # Include storage metadata if available
-            storage_metadata = raga.get("storage_metadata")
-            
-            raga_item = RagaSchema(
-                song_id=raga.get("_id", ""),
-                title=raga.get("title", ""),
-                rasa=raga.get("rasa", "Shaant"),
-                audio_url=audio_url,
-                duration=raga.get("duration", "0:00"),
-                storage_metadata=storage_metadata
-            )
-            raga_list.append(raga_item)
+            try:
+                # Generate proper URL based on storage type
+                audio_url = await _get_song_url(raga)
+                
+                # Include storage metadata if available
+                storage_metadata = raga.get("storage_metadata")
+                
+                # Convert duration to string if it's an int
+                duration = raga.get("duration", "0:00")
+                if isinstance(duration, int):
+                    # Convert seconds to "mm:ss" format
+                    mins = duration // 60
+                    secs = duration % 60
+                    duration = f"{mins}:{secs:02d}"
+                
+                raga_item = RagaSchema(
+                    song_id=raga.get("song_id", str(raga.get("_id", ""))),
+                    title=raga.get("title", ""),
+                    rasa=raga.get("rasa", "Shaant"),
+                    audio_url=audio_url,
+                    duration=str(duration),
+                    storage_metadata=storage_metadata
+                )
+                raga_list.append(raga_item)
+            except Exception as e:
+                logger.warning(f"Failed to convert raga {raga.get('title')}: {e}")
+                continue
         
         # Cache results
         cached_data = [item.model_dump() for item in raga_list]
@@ -113,17 +125,25 @@ async def get_raga_details(raga_id: str):
         if not raga:
             raise HTTPException(status_code=404, detail="Raga not found")
         
-        # Generate proper URL based on storage type
-        audio_url = await _get_song_url(raga)
-        
-        raga_item = RagaSchema(
-            song_id=raga.get("_id", ""),
-            title=raga.get("title", ""),
-            rasa=raga.get("rasa", "Shaant"),
-            audio_url=audio_url,
-            duration=raga.get("duration", "0:00"),
-            storage_metadata=raga.get("storage_metadata")
-        )
+         # Generate proper URL based on storage type
+         audio_url = await _get_song_url(raga)
+         
+         # Convert duration to string if it's an int
+         duration = raga.get("duration", "0:00")
+         if isinstance(duration, int):
+             # Convert seconds to "mm:ss" format
+             mins = duration // 60
+             secs = duration % 60
+             duration = f"{mins}:{secs:02d}"
+         
+         raga_item = RagaSchema(
+             song_id=raga.get("song_id", str(raga.get("_id", ""))),
+             title=raga.get("title", ""),
+             rasa=raga.get("rasa", "Shaant"),
+             audio_url=audio_url,
+             duration=str(duration),
+             storage_metadata=raga.get("storage_metadata")
+         )
         
         # Cache result
         await cache_set(cache_key, raga_item.model_dump(), expiry=3600)
@@ -212,16 +232,24 @@ async def get_song_by_id(song_id: str):
         # Try to find song in database first
         song = await db.songs.find_one({"_id": song_id})
         
-        if song:
-            audio_url = await _get_song_url(song)
-            
-            raga_item = RagaSchema(
-                song_id=song.get("_id", ""),
-                title=song.get("title", ""),
-                rasa=song.get("rasa", "Shaant"),
-                audio_url=audio_url,
-                duration=song.get("duration", "0:00"),
-                storage_metadata=song.get("storage_metadata")
+         if song:
+             audio_url = await _get_song_url(song)
+             
+             # Convert duration to string if it's an int
+             duration = song.get("duration", "0:00")
+             if isinstance(duration, int):
+                 # Convert seconds to "mm:ss" format
+                 mins = duration // 60
+                 secs = duration % 60
+                 duration = f"{mins}:{secs:02d}"
+             
+             raga_item = RagaSchema(
+                 song_id=song.get("song_id", str(song.get("_id", ""))),
+                 title=song.get("title", ""),
+                 rasa=song.get("rasa", "Shaant"),
+                 audio_url=audio_url,
+                 duration=str(duration),
+                 storage_metadata=song.get("storage_metadata")
             )
             logger.info(f"Retrieved song from database: {raga_item.title}")
             return raga_item
