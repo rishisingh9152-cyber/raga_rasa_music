@@ -46,7 +46,7 @@ async def _create_collections():
     """Create collections if they don't exist"""
     try:
         db = get_db()
-        if not db:
+        if db is None:
             logger.warning("[Database] Database not available, skipping collection creation")
             return
         
@@ -80,7 +80,7 @@ async def _create_indexes():
     """Create database indexes for efficient queries"""
     try:
         db = get_db()
-        if not db:
+        if db is None:
             logger.warning("[Database] Database not available, skipping index creation")
             return
         
