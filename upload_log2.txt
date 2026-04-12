@@ -1,0 +1,303 @@
+﻿python : INFO: Uploading: desh_amjadalikhan_hasya_shant.mp3
+At line:1 char:38
++ ... i\raga_rasa_music"; python upload_songs_to_cloudinary.py 2>&1 | Out-F ...
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO: Uploading...hasya_shant.mp3:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: kamaj_amjadalikhan_shant.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: malkuans_amjadalikhan_shant.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: 
+raag-ahir-bhairav-albela-sajan-full-video-song-hum-dil-de-chuke-sanam-ismail-darbar-salman-khan-a_m2yzx4es.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-apne jeevan ki uljhan ko [hd] hindi classic songs_ sulakshana pandit  lata 
+mangeshkar  uljhan 1975.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-jago mohan pyare  raag bhairav  riyaz daily.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: 
+raag-ahir-bhairav-ka-karoon-sajani-aaye-swami-1977-songs-shabana-azmi-dheeraj-kumar-yesudas-filmig_jmyj3zi7.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-madhuban-mein-radhika-nache-re-hd_jfoovwc0.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-man anand anand chhayo.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-man-anand-anand-chhayo_5q8lh6bn.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-prabhu tero naam jo dhyaye  lata mangeshkar  sahir ludhianvi  hum dono.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-ram ka gungaan kariye by pandit bhimsen joshi & lata mangeshkar.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-ahir-bhairav-\u092e\u0927\u092c\u0928 \u092e \u0930\u0927\u0915 \u0928\u091a \u0930 madhuban 
+mein radhika nache re - hd \u0935\u0921\u092f \u0938\u0917 - \u092e\u0939\u092e\u092e\u0926 \u0930\u092b.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-chanda-hai-tu-lata-mangeshkar.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-dehachi tijori bhaktichach theva  marathi prarthana  ughad daar deva aata.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-dekha ek khwab song  silsila  amitabh bachchan, rekha  kishore kumar, lata mangeshkar, 
+shiv-hari.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-kanchi re kanchi re   hare rama hare krishna.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-mere to giridhar gopalms subbulakshmimeera.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-panchhi banoo udti phiroon-lata-mangeshkar-nargis.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhupali-umrao jaan  - in aankhon ki masti.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-kalyan-aaye ho meri zindagi mein  alka yagnik  raja hindustani  1996.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-kalyan-aaye ho meri zindagi mein (male)  aamir, karisma  udit narayan  raja hindustani  90's hit 
+hindi.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-kalyan-abhi na jao chor kar ke dil abhi bhara nahi.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-kalyan-chandan sa badan (maleversion) (hd) - saraswatichandra - nutan - manish - bollywood 
+evergreen songs.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-shaant-aa-neele-gagan-tale-pyar-hum-kare---badshah---hemant-kumar-and-lata.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-shaant-raag-bhairavi-mohe-bhool-gaye.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-shaant-test-upload-song.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-shree-at-sunset-manjusha-patil.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-shree-pt-venkatesh-kumar-bazm-e-khas.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raga-shree-vidushi-shruti-sadolikar-katkar-kaha-main-guru-dhundan-sumira-kar-l_r1mxdmst.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raga-shree-vidushi-shruti-sadolikar-katkar-kaha-main-guru-dhundan-sumira-kar-l_xusupgu3.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: yaman_gundechabros_shant.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: bhopaltodi_aliakbarkhan_shok.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: Desh_amjadalikhan_hasya_shant.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: jogiya_amjadalikhan_shok.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: kaushiki-chakraborty-raag-bhairavi-shadaj-2021_uk9l91js.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: marwa_kushaldas_shok.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhairavi-awara hoon  raj kapoor nargis  awaara  mukesh  evergreen bollywood song.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhairavi-babul mora naihar chhooto jaye  \u092c\u092c\u0932 \u092e\u0930 \u0928\u0939\u0930 
+chitra singh  jagjit singh ghazals  ghazal songs.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhairavi-ka karoon sajani aaye - swami 1977 songs - shabana azmi - dheeraj kumar - yesudas - 
+filmigaane (1).mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhairavi-suno chhoti si gudiya ki kahani (happy) - lata mangeshkar songs  nutan  seema (1955) 
+movie songs.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-bhairavi-\u0910 \u092e\u0932\u0915 \u0924\u0930 \u092c\u0926 \u0939\u092e aye malik tere bande 
+hum - hd \u0935\u0921\u092f \u0938\u0917 - \u0932\u0924 \u092e\u0917\u0936\u0915\u0930, \u092e\u0928\u0928 \u0921.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-darbari-kanada-dil jalta hai to jalne de mukesh film pehli nazar (1945) anil biswas  safdar aah 
+sitapuri.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-darbari-kanada-jane kahan gaye woh din with lyrics  \u091c\u0928 \u0915\u0939 \u0917\u090f 
+\u0935\u0939 \u0926\u0928 \u0915 \u092c\u0932   mukesh.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-darbari-kanada-jhanak jhanak tori baaje payaliya- manna dey -film-mere huzoor(1968)md-shankar 
+jaikishan ly-hasrat.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-darbari-kanada-koi matwala 4k video song  \u0915\u0908 \u092e\u0924\u0935\u0932  lata mangeshkar 
+ asha parkeh  love in tokyo.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-darbari-kanada-mohabbat ki jhooti kahani pe roye - lata mangeshkar  madhubala  mughal-e-azam.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-darbari-kanada-o duniya ke rakhwale (hd)  baiju bawra songs  meena kumari  bharat bhushan  
+naushad hits.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raga jogia  hindustani classical vocalist  sanchaita chaudhuri.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raga-bhairavi-raga-bharava-pt-hariprasad-chaurasia-flute-music.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: bahar_amjadalikhan_rati.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: bilkashanitodi_kushaldas_rati.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: purbayan chatterjee_yaman_shringar.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: adana_nikhilbanerjee_veer.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: bahar_amjadalikhan_veer.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: bhimpalasi_kushaldas_veer.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raag-veer-aa-neele-gagan-tale-pyar-hum-kare---badshah---hemant-kumar-and-lata.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raga-bahaduri-todi-by-manjiri-asanare-kelkar.mp3
+INFO:   [OK] Uploaded successfully
+INFO: Uploading: raga-bahaduri-todi-vidushi-dr-ashwini-bhide-deshpande-pashupati-naath-akqw_11t5brl9.mp3
+INFO:   [OK] Uploaded successfully
+
+======================================================================
+RAGARASA SONG UPLOAD & DATABASE INTEGRATION
+======================================================================
+
+======================================================================
+CLOUDINARY SONG UPLOADER
+======================================================================
+
+[INFO] Found 59 songs to upload
+
+Songs by Rasa:
+  Shringar: 3 songs
+  Shaant: 32 songs
+  Veer: 6 songs
+  Shok: 18 songs
+
+----------------------------------------------------------------------
+UPLOADING SONGS...
+----------------------------------------------------------------------
+
+[1/59] desh_amjadalikhan_hasya_shant (Shaant)
+
+[2/59] kamaj_amjadalikhan_shant (Shaant)
+
+[3/59] malkuans_amjadalikhan_shant (Shaant)
+
+[4/59] raag-ahir-bhairav-albela-sajan-full-vide (Shaant)
+
+[5/59] raag-ahir-bhairav-apne jeevan ki uljhan  (Shaant)
+
+[6/59] raag-ahir-bhairav-jago mohan pyare  raag (Shaant)
+
+[7/59] raag-ahir-bhairav-ka-karoon-sajani-aaye- (Shaant)
+
+[8/59] raag-ahir-bhairav-madhuban-mein-radhika- (Shaant)
+
+[9/59] raag-ahir-bhairav-man anand anand chhayo (Shaant)
+
+[10/59] raag-ahir-bhairav-man-anand-anand-chhayo (Shaant)
+
+[11/59] raag-ahir-bhairav-prabhu tero naam jo dh (Shaant)
+
+[12/59] raag-ahir-bhairav-ram ka gungaan kariye  (Shaant)
+
+[13/59] raag-ahir-bhairav-αñ«αñºαñ¼αñ¿ αñ« αñ░αñºαñò αñ¿αñÜ αñ░ madhub (Shaant)
+
+[14/59] raag-bhupali-chanda-hai-tu-lata-mangeshk (Shaant)
+
+[15/59] raag-bhupali-dehachi tijori bhaktichach  (Shaant)
+
+[16/59] raag-bhupali-dekha ek khwab song  silsil (Shaant)
+
+[17/59] raag-bhupali-kanchi re kanchi re   hare  (Shaant)
+
+[18/59] raag-bhupali-mere to giridhar gopalms su (Shaant)
+
+[19/59] raag-bhupali-panchhi banoo udti phiroon- (Shaant)
+
+[20/59] raag-bhupali-umrao jaan  - in aankhon ki (Shaant)
+
+[21/59] raag-kalyan-aaye ho meri zindagi mein  a (Shaant)
+
+[22/59] raag-kalyan-aaye ho meri zindagi mein (m (Shaant)
+
+[23/59] raag-kalyan-abhi na jao chor kar ke dil  (Shaant)
+
+[24/59] raag-kalyan-chandan sa badan (maleversio (Shaant)
+
+[25/59] raag-shaant-aa-neele-gagan-tale-pyar-hum (Shaant)
+
+[26/59] raag-shaant-raag-bhairavi-mohe-bhool-gay (Shaant)
+
+[27/59] raag-shaant-test-upload-song (Shaant)
+
+[28/59] raag-shree-at-sunset-manjusha-patil (Shaant)
+
+[29/59] raag-shree-pt-venkatesh-kumar-bazm-e-kha (Shaant)
+
+[30/59] raga-shree-vidushi-shruti-sadolikar-katk (Shaant)
+
+[31/59] raga-shree-vidushi-shruti-sadolikar-katk (Shaant)
+
+[32/59] yaman_gundechabros_shant (Shaant)
+
+[33/59] bhopaltodi_aliakbarkhan_shok (Shok)
+
+[34/59] Desh_amjadalikhan_hasya_shant (Shok)
+
+[35/59] jogiya_amjadalikhan_shok (Shok)
+
+[36/59] kaushiki-chakraborty-raag-bhairavi-shada (Shok)
+
+[37/59] marwa_kushaldas_shok (Shok)
+
+[38/59] raag-bhairavi-awara hoon  raj kapoor nar (Shok)
+
+[39/59] raag-bhairavi-babul mora naihar chhooto  (Shok)
+
+[40/59] raag-bhairavi-ka karoon sajani aaye - sw (Shok)
+
+[41/59] raag-bhairavi-suno chhoti si gudiya ki k (Shok)
+
+[42/59] raag-bhairavi-αñÉ αñ«αñ▓αñò αññαñ░ αñ¼αñª αñ╣αñ« aye malik t (Shok)
+
+[43/59] raag-darbari-kanada-dil jalta hai to jal (Shok)
+
+[44/59] raag-darbari-kanada-jane kahan gaye woh  (Shok)
+
+[45/59] raag-darbari-kanada-jhanak jhanak tori b (Shok)
+
+[46/59] raag-darbari-kanada-koi matwala 4k video (Shok)
+
+[47/59] raag-darbari-kanada-mohabbat ki jhooti k (Shok)
+
+[48/59] raag-darbari-kanada-o duniya ke rakhwale (Shok)
+
+[49/59] raga jogia  hindustani classical vocalis (Shok)
+
+[50/59] raga-bhairavi-raga-bharava-pt-hariprasad (Shok)
+
+[51/59] bahar_amjadalikhan_rati (Shringar)
+
+[52/59] bilkashanitodi_kushaldas_rati (Shringar)
+
+[53/59] purbayan chatterjee_yaman_shringar (Shringar)
+
+[54/59] adana_nikhilbanerjee_veer (Veer)
+
+[55/59] bahar_amjadalikhan_veer (Veer)
+
+[56/59] bhimpalasi_kushaldas_veer (Veer)
+
+[57/59] raag-veer-aa-neele-gagan-tale-pyar-hum-k (Veer)
+
+[58/59] raga-bahaduri-todi-by-manjiri-asanare-ke (Veer)
+
+[59/59] raga-bahaduri-todi-vidushi-dr-ashwini-bh (Veer)
+
+======================================================================
+UPLOAD COMPLETE: 59 uploaded, 0 failed
+======================================================================
+
+----------------------------------------------------------------------
+SAVING TO MONGODB...
+----------------------------------------------------------------------
+[OK] Connected to MongoDB
+
+[INFO] Inserting 59 songs into MongoDB (with upsert)...
+[OK] Inserted/updated 59 songs
+
+[INFO] Verifying data in MongoDB...
+[OK] Total songs in database: 58
+
+Songs by Rasa in MongoDB:
+  Shringar: 3
+  Shaant: 31
+  Veer: 6
+  Shok: 18
+
+======================================================================
+[SUCCESS] All songs uploaded and database updated!
+======================================================================
