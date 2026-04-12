@@ -90,6 +90,13 @@ async def login(request: LoginSchema):
     """
     db = get_db()
     
+    if db is None:
+        logger.error("[Login] Database not initialized")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database connection failed"
+        )
+    
     # Find user by email
     user = await db.users.find_one({"email": request.email})
     
