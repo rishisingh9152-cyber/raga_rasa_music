@@ -200,6 +200,7 @@ async def get_songs_by_rasa(rasa: Optional[str] = None) -> Dict:
         Dictionary with songs organized by rasa
     """
     try:
+        logger.info(f"[ByRasa] Getting songs, filter: {rasa}")
         db = get_db()
         
         # Build query
@@ -208,6 +209,49 @@ async def get_songs_by_rasa(rasa: Optional[str] = None) -> Dict:
             query["rasa"] = rasa
         
         # Get songs from database
+        songs = await db.songs.find(query).to_list(None)
+        logger.info(f"[ByRasa] Found {len(songs)} songs")
+        
+        # Convert to simple format (no schema validation)
+        result_songs = []
+        for song in songs:
+            try:
+                duration = song.get("duration", 0)
+                if isinstance(duration, int):
+                    mins = duration // 60
+                    secs = duration % 60
+                    duration_str = f"{mins}:{secs:02d}"
+                else:
+                    duration_str = str(duration)
+                
+                song_dict = {
+                    "song_id": song.get("song_id", str(song.get("_id", ""))),
+                    "title": song.get("title", ""),
+                    "artist": song.get("artist", ""),
+                    "rasa": song.get("rasa", "Shaant"),
+                    "audio_url": song.get("audio_url", ""),
+                    "duration": duration_str,
+                    "confidence": song.get("confidence", 1.0),
+                }
+                result_songs.append(song_dict)
+            except Exception as e:
+                logger.warning(f"[ByRasa] Failed to convert song: {e}")
+                continue
+        
+        # Organize by rasa
+        songs_data = {}
+        for song in result_songs:
+            rasa_key = song["rasa"]
+            if rasa_key not in songs_data:
+                songs_data[rasa_key] = []
+            songs_data[rasa_key].append(song)
+        
+        logger.info(f"[ByRasa] Returning {len(result_songs)} songs organized by {len(songs_data)} ragas")
+        return {"songs": result_songs, "by_rasa": songs_data, "total": len(result_songs)}
+        
+    except Exception as e:
+        logger.error(f"[ByRasa] Failed to fetch songs by rasa: {e}", exc_info=True)
+        return {"error": str(e), "songs": [], "by_rasa": {}, "total": 0}
         songs = await db.songs.find(query).to_list(None)
         
         # Organize by rasa

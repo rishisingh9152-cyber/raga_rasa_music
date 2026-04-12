@@ -13,12 +13,25 @@ logger = logging.getLogger(__name__)
 # Rasa mapping for emotion-based filtering
 # Note: Some emotions map to multiple ragas for better therapeutic outcomes
 EMOTION_TO_RASA = {
+    # Lowercase versions (from emotion detection)
+    'happy': 'Shringar',
+    'surprised': 'Shringar',
+    'sad': ['Shaant', 'Shringar'],  # Both calming and uplifting for sadness
+    'angry': 'Shaant',
+    'fearful': 'Veer',
+    'fear': 'Veer',
+    'disgusted': 'Veer',
+    'disgust': 'Veer',
+    'neutral': 'Shaant',
+    # Capitalized versions (for compatibility)
     'Happy': 'Shringar',
     'Surprised': 'Shringar',
-    'Sad': ['Shaant', 'Shringar'],  # Both calming and uplifting for sadness
+    'Sad': ['Shaant', 'Shringar'],
     'Angry': 'Shaant',
     'Fearful': 'Veer',
+    'Fear': 'Veer',
     'Disgusted': 'Veer',
+    'Disgust': 'Veer',
     'Neutral': 'Shaant',
 }
 
@@ -50,8 +63,13 @@ class RecommendationEngine:
             List of recommended songs
         """
         try:
-            # Step 1: Get target rasa(s) based on emotion
-            target_ragas = EMOTION_TO_RASA.get(emotion, 'Shaant')
+            logger.info(f"[Recommend] Getting recommendations for emotion: {emotion}")
+            
+            # Step 1: Normalize emotion to lowercase for lookup
+            emotion_normalized = emotion.lower()
+            target_ragas = EMOTION_TO_RASA.get(emotion_normalized, 'Shaant')
+            logger.info(f"[Recommend] Normalized emotion '{emotion}' to '{emotion_normalized}', target ragas: {target_ragas}")
+            
             # Handle both single rasa string and multiple ragas list
             if isinstance(target_ragas, str):
                 target_ragas = [target_ragas]
@@ -60,11 +78,13 @@ class RecommendationEngine:
             matching_songs = []
             for rasa in target_ragas:
                 rasa_songs = await self._get_songs_by_rasa(rasa)
+                logger.info(f"[Recommend] Found {len(rasa_songs)} songs for rasa '{rasa}'")
                 matching_songs.extend(rasa_songs)
             
             if not matching_songs:
-                logger.warning(f"No songs found for ragas: {target_ragas}")
+                logger.warning(f"No songs found for ragas: {target_ragas}, fetching all songs as fallback")
                 matching_songs = await self._get_all_songs()
+                logger.info(f"[Recommend] Fallback: got {len(matching_songs)} total songs")
             
             # Step 3: Score songs based on multiple factors
             scored_songs = await self._score_songs(
@@ -76,10 +96,12 @@ class RecommendationEngine:
             
             # Step 4: Rank and return top N
             ranked_songs = sorted(scored_songs, key=lambda x: x['score'], reverse=True)
-            return [self._to_song_schema(song) for song in ranked_songs[:self.max_recommendations]]
+            result = [self._to_song_schema(song) for song in ranked_songs[:self.max_recommendations]]
+            logger.info(f"[Recommend] Returning {len(result)} recommendations")
+            return result
             
         except Exception as e:
-            logger.error(f"Recommendation error: {e}")
+            logger.error(f"[Recommend] Recommendation error: {e}", exc_info=True)
             return []
     
     async def _get_songs_by_rasa(self, rasa: str) -> List[Dict]:
