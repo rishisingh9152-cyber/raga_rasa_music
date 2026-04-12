@@ -5,7 +5,6 @@ Restart: 2
 """
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
@@ -15,6 +14,7 @@ from app.routes import session, emotion, recommendation, rating, history, catalo
 from app.services.cache import init_redis
 from app.services.song_upload import initialize_directories
 from app.services.rate_limiting import limiter
+from app.middleware.cors import CustomCORSMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -75,27 +75,17 @@ app = FastAPI(
 # Add rate limiter state to app
 app.state.limiter = limiter
 
-# CORS Configuration - Allow frontend requests
-# Include production, preview, and localhost URLs
-cors_origins = [
-    "https://raga-rasa-music-52.vercel.app",
-    "https://raga-rasa-music-52-43uvvd8w8-rishisingh9152-cybers-projects.vercel.app",  # Current preview
-    "http://localhost:5173",
-    "http://localhost:8080",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:8080",
-]
-
-# Add additional origins from settings
-if settings.ALLOWED_ORIGINS_STR:
-    cors_origins.extend([o.strip() for o in settings.ALLOWED_ORIGINS_STR.split(",")])
-
-# Remove duplicates
-cors_origins = list(set(cors_origins))
-
+# CORS Configuration - Allow frontend requests with wildcard support for Vercel
+# Pattern: https://*.vercel.app allows all Vercel preview and production deployments
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_origins,
+    CustomCORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8080",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",  # Match all Vercel deployments
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
