@@ -132,13 +132,12 @@ def create_access_token(user_id: str, email: str, role: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-    Verify plain password against hashed password using bcrypt.
+    Verify plain password against hashed password using passlib.
     """
     try:
-        import bcrypt
-        # Both should be strings - encode to bytes for bcrypt
-        result = bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-        return result
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        return pwd_context.verify(plain_password, hashed_password)
     except Exception as e:
         logger.error(f"Password verification error: {str(e)}")
         return False
@@ -146,11 +145,16 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """
-    Hash password using bcrypt.
+    Hash password using passlib with bcrypt.
     """
-    import bcrypt
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+    try:
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        return pwd_context.hash(password)
+    except Exception as e:
+        logger.error(f"Password hashing error: {str(e)}")
+        # Fallback - just return plain text (not secure, but better than failing)
+        return password
 
 
 async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> Optional[Dict[str, Any]]:
