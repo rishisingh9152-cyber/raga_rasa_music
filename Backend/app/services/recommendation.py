@@ -137,30 +137,44 @@ class RecommendationEngine:
               + 0.3 * user_preference
               + 0.2 * freshness
         """
+        if not songs:
+            logger.warning("[Score] No songs to score")
+            return []
+        
+        logger.info(f"[Score] Scoring {len(songs)} songs")
         scored_songs = []
         
-        for song in songs:
-            song_copy = song.copy()
-            
-            # Content-based similarity (quality + audio features)
-            content_score = self._compute_content_similarity(song, cognitive_data)
-            
-            # User preference (collaborative filtering)
-            user_score = await self._compute_user_preference(song['_id'], user_id) if user_id else 0.5
-            
-            # Freshness (newer songs get slight boost)
-            freshness_score = self._compute_freshness(song)
-            
-            # Combined score
-            final_score = (0.5 * content_score) + (0.3 * user_score) + (0.2 * freshness_score)
-            
-            song_copy['score'] = final_score
-            song_copy['content_score'] = content_score
-            song_copy['user_score'] = user_score
-            song_copy['freshness_score'] = freshness_score
-            
-            scored_songs.append(song_copy)
+        for idx, song in enumerate(songs):
+            try:
+                song_copy = song.copy()
+                
+                # Content-based similarity (quality + audio features)
+                content_score = self._compute_content_similarity(song, cognitive_data)
+                
+                # User preference (collaborative filtering)
+                song_id = song.get('_id') or song.get('song_id')
+                user_score = await self._compute_user_preference(str(song_id), user_id) if user_id else 0.5
+                
+                # Freshness (newer songs get slight boost)
+                freshness_score = self._compute_freshness(song)
+                
+                # Combined score
+                final_score = (0.5 * content_score) + (0.3 * user_score) + (0.2 * freshness_score)
+                
+                song_copy['score'] = final_score
+                song_copy['content_score'] = content_score
+                song_copy['user_score'] = user_score
+                song_copy['freshness_score'] = freshness_score
+                
+                scored_songs.append(song_copy)
+                logger.debug(f"[Score] Song {idx}: {song.get('title')} - score: {final_score:.3f}")
+            except Exception as e:
+                logger.warning(f"[Score] Failed to score song {song.get('title')}: {e}")
+                # Give it a default score so it's still returned
+                song['score'] = 0.3
+                scored_songs.append(song)
         
+        logger.info(f"[Score] Scored {len(scored_songs)} songs")
         return scored_songs
     
     def _compute_content_similarity(self, song: Dict, cognitive_data: Dict) -> float:
@@ -258,13 +272,22 @@ class RecommendationEngine:
     
     def _to_song_schema(self, song: Dict) -> SongSchema:
         """Convert song document to API schema"""
+        # Convert duration to string if it's an int
+        duration = song.get('duration', None)
+        if isinstance(duration, int):
+            mins = duration // 60
+            secs = duration % 60
+            duration = f"{mins}:{secs:02d}"
+        
         return SongSchema(
-            song_id=song.get('_id', ''),
+            song_id=song.get('song_id', str(song.get('_id', ''))),
             title=song.get('title', ''),
             audio_url=song.get('audio_url', ''),
             rasa=song.get('rasa', 'Shaant'),
-            confidence=song.get('score', 0.5),  # Use computed score as confidence
-            duration=song.get('duration', None)
+            confidence=song.get('score', song.get('confidence', 0.5)),  # Use computed score or confidence
+            duration=duration,
+            rasa_confidence=song.get('rasa_confidence', 1.0),
+            storage_metadata=None
         )
 
 
