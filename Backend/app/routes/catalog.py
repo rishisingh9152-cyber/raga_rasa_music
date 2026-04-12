@@ -35,6 +35,33 @@ async def test_songs_count():
         return {"status": "error", "message": str(e), "exc_info": str(e.__class__.__name__)}
 
 
+@router.get("/ragas/simple")
+async def get_ragas_simple():
+    """Simple endpoint to test database access - returns raw dict"""
+    try:
+        db = get_db()
+        if not db:
+            return {"error": "Database not initialized", "status": "db_init_failed"}
+        
+        ragas = await db.songs.find({}).to_list(5)
+        
+        # Convert ObjectIds to strings for JSON serialization
+        result = []
+        for raga in ragas:
+            result.append({
+                "title": raga.get("title"),
+                "rasa": raga.get("rasa"),
+                "duration": raga.get("duration"),
+                "audio_url": raga.get("audio_url", "no_url")[:50] + "..."
+            })
+        
+        return {"status": "success", "count": len(result), "samples": result}
+        
+    except Exception as e:
+        logger.error(f"Simple test failed: {e}", exc_info=True)
+        return {"error": str(e), "status": "error"}
+
+
 @router.get("/ragas/list", response_model=List[RagaSchema])
 async def get_ragas_list(rasa: Optional[str] = None):
     """
