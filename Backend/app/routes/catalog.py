@@ -32,13 +32,6 @@ async def get_ragas_list(rasa: Optional[str] = None):
         List of available ragas with proper URLs (local or cloud)
     """
     try:
-        # Check cache
-        cache_key = f"ragas:list:{rasa or 'all'}"
-        cached = await cache_get(cache_key)
-        if cached:
-            logger.info(f"Ragas list retrieved from cache")
-            return [RagaSchema(**raga) for raga in cached]
-        
         db = get_db()
         
         # Build query
@@ -49,11 +42,6 @@ async def get_ragas_list(rasa: Optional[str] = None):
         # Fetch ragas from database
         ragas = await db.songs.find(query).to_list(None)
         
-        # If no ragas in DB, try loading from filesystem
-        if not ragas:
-            logger.info("No ragas in database, attempting to load from filesystem")
-            ragas = _load_ragas_from_filesystem(rasa)
-        
         if not ragas:
             logger.warning(f"No ragas found with filter: {rasa}")
             return []
@@ -63,10 +51,7 @@ async def get_ragas_list(rasa: Optional[str] = None):
         for raga in ragas:
             try:
                 # Generate proper URL based on storage type
-                audio_url = await _get_song_url(raga)
-                
-                # Include storage metadata if available
-                storage_metadata = raga.get("storage_metadata")
+                audio_url = raga.get("audio_url")
                 
                 # Convert duration to string if it's an int
                 duration = raga.get("duration", "0:00")
@@ -80,18 +65,14 @@ async def get_ragas_list(rasa: Optional[str] = None):
                     song_id=raga.get("song_id", str(raga.get("_id", ""))),
                     title=raga.get("title", ""),
                     rasa=raga.get("rasa", "Shaant"),
-                    audio_url=audio_url,
+                    audio_url=audio_url or "/api/songs/stream/unknown",
                     duration=str(duration),
-                    storage_metadata=storage_metadata
+                    storage_metadata=None
                 )
                 raga_list.append(raga_item)
             except Exception as e:
-                logger.warning(f"Failed to convert raga {raga.get('title')}: {e}")
+                logger.warning(f"Failed to convert raga {raga.get('title')}: {e}", exc_info=True)
                 continue
-        
-        # Cache results
-        cached_data = [item.model_dump() for item in raga_list]
-        await cache_set(cache_key, cached_data, expiry=3600)  # Cache for 1 hour
         
         logger.info(f"Retrieved {len(raga_list)} ragas with filter: {rasa}")
         return raga_list
