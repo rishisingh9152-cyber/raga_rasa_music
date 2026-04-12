@@ -20,6 +20,21 @@ router = APIRouter()
 SONGS_BASE_DIR = Path(settings.STORAGE_BASE_PATH)
 
 
+@router.get("/test/songs-count")
+async def test_songs_count():
+    """Test endpoint to check if database is accessible"""
+    try:
+        db = get_db()
+        if not db:
+            return {"status": "error", "message": "Database not initialized"}
+        
+        collection = db.songs
+        count = await collection.count_documents({})
+        return {"status": "success", "total_songs": count}
+    except Exception as e:
+        return {"status": "error", "message": str(e), "exc_info": str(e.__class__.__name__)}
+
+
 @router.get("/ragas/list", response_model=List[RagaSchema])
 async def get_ragas_list(rasa: Optional[str] = None):
     """
