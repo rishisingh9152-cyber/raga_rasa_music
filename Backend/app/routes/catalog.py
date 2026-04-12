@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 from app.database import get_db
-from app.models import RagaSchema
+from app.models import RagaSchema, SongSchema
 from app.services.cache import cache_get, cache_set
 from app.services.song_scanner import get_song_scanner
 from app.services.cloud_storage import get_storage_provider
@@ -62,7 +62,7 @@ async def get_ragas_simple():
         return {"error": str(e), "status": "error"}
 
 
-@router.get("/ragas/list", response_model=List[RagaSchema])
+@router.get("/ragas/list", response_model=List[SongSchema])
 async def get_ragas_list(rasa: Optional[str] = None):
     """
     Get list of available ragas for music player
@@ -99,7 +99,7 @@ async def get_ragas_list(rasa: Optional[str] = None):
                 audio_url = raga.get("audio_url")
                 
                 # Convert duration to string if it's an int
-                duration = raga.get("duration", "0:00")
+                duration = raga.get("duration", None)
                 if isinstance(duration, int):
                     # Convert seconds to "mm:ss" format
                     mins = duration // 60
@@ -109,12 +109,14 @@ async def get_ragas_list(rasa: Optional[str] = None):
                 song_id_val = raga.get("song_id", str(raga.get("_id", f"unknown_{idx}")))
                 logger.debug(f"[Catalog] Processing song {idx}: {raga.get('title')} (id: {song_id_val})")
                 
-                raga_item = RagaSchema(
+                raga_item = SongSchema(
                     song_id=song_id_val,
                     title=raga.get("title", ""),
-                    rasa=raga.get("rasa", "Shaant"),
                     audio_url=audio_url or "/api/songs/stream/unknown",
-                    duration=str(duration),
+                    rasa=raga.get("rasa", "Shaant"),
+                    confidence=raga.get("confidence", 1.0),
+                    duration=duration,
+                    rasa_confidence=raga.get("rasa_confidence", 1.0),
                     storage_metadata=None
                 )
                 raga_list.append(raga_item)
