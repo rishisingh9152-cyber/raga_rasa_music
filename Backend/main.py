@@ -101,6 +101,25 @@ app.include_router(images.router, prefix="/api", tags=["images"])
 app.include_router(admin.router, prefix="/api", tags=["admin"])
 
 
+@app.get("/db-test")
+async def db_test():
+    """Test database connection"""
+    from app.database import get_db
+    try:
+        db = get_db()
+        if not db:
+            logger.error("[DBTest] Database is None - not initialized")
+            return {"status": "error", "message": "Database not initialized", "initialized": False}
+        
+        logger.info("[DBTest] Testing database count_documents...")
+        count = await db.songs.count_documents({})
+        logger.info(f"[DBTest] Success - found {count} songs")
+        return {"status": "success", "total_songs": count, "initialized": True}
+    except Exception as e:
+        logger.error(f"[DBTest] Database test failed: {e}", exc_info=True)
+        return {"status": "error", "message": str(e), "initialized": False}
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""

@@ -18,17 +18,39 @@ async def init_db():
     """Initialize MongoDB connection"""
     global _client, _db
     try:
-        logger.info(f"[Database] Connecting to MongoDB at {settings.MONGODB_URL}")
-        _client = AsyncIOMotorClient(settings.MONGODB_URL, serverSelectionTimeoutMS=5000)
+        logger.info(f"[Database] Connecting to MongoDB...")
+        logger.info(f"[Database] Using serverSelectionTimeoutMS=15000 (15 seconds for Render cold start)")
+        
+        # MongoDB Atlas requires SSL/TLS
+        # Use longer timeout for Render cold starts
+        _client = AsyncIOMotorClient(
+            settings.MONGODB_URL,
+            serverSelectionTimeoutMS=15000,  # Increased from 5000ms
+            connectTimeoutMS=10000,           # Add connection timeout
+            retryWrites=True,
+            maxPoolSize=50,
+            minPoolSize=10,
+        )
         
         # Verify connection with ping
         logger.info(f"[Database] Pinging MongoDB server...")
-        await _client.admin.command('ping')
-        logger.info(f"[Database] MongoDB ping successful")
+        try:
+            await _client.admin.command('ping')
+            logger.info(f"[Database] MongoDB ping successful")
+        except Exception as ping_err:
+            logger.error(f"[Database] Ping failed: {ping_err}")
+            logger.info(f"[Database] Retrying ping...")
+            await _client.admin.command('ping')
+            logger.info(f"[Database] MongoDB ping successful on retry")
         
         # Get database instance
         _db = _client[settings.DATABASE_NAME]
         logger.info(f"[Database] Connected to database: {settings.DATABASE_NAME}")
+        
+        # Test a simple query
+        logger.info(f"[Database] Testing database access with count_documents...")
+        count = await _db.songs.count_documents({})
+        logger.info(f"[Database] Successfully accessed songs collection, count: {count}")
         
         # Initialize collections and indexes
         await _create_collections()
