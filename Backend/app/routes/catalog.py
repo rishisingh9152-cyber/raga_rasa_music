@@ -62,6 +62,30 @@ async def get_ragas_simple():
         return {"error": str(e), "status": "error"}
 
 
+@router.get("/test/db-status")
+async def test_db_status():
+    """Test endpoint to check database status"""
+    try:
+        db = get_db()
+        if not db:
+            logger.error("[Test] Database is None!")
+            return {"status": "error", "message": "Database not initialized", "db": None}
+        
+        # Try to ping
+        logger.info("[Test] Pinging database...")
+        try:
+            await db.songs.count_documents({})
+            count = await db.songs.count_documents({})
+            logger.info(f"[Test] Database ping successful, songs count: {count}")
+            return {"status": "success", "message": "Database initialized", "total_songs": count}
+        except Exception as ping_error:
+            logger.error(f"[Test] Database ping failed: {ping_error}", exc_info=True)
+            return {"status": "error", "message": f"Database ping failed: {str(ping_error)}", "total_songs": 0}
+    except Exception as e:
+        logger.error(f"[Test] Status check failed: {e}", exc_info=True)
+        return {"status": "error", "message": str(e)}
+
+
 @router.get("/ragas/list", response_model=List[SongSchema])
 async def get_ragas_list(rasa: Optional[str] = None):
     """
