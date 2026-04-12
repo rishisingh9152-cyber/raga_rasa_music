@@ -110,14 +110,20 @@ async def login(request: LoginSchema):
     # Find user by email
     user = await db.users.find_one({"email": request.email})
     
+    logger.info(f"[Login] Looking for user: {request.email}")
+    
     if not user:
+        logger.warning(f"[Login] User not found: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
     
+    logger.info(f"[Login] User found: {user.get('user_id')}, verifying password...")
+    
     # Verify password
     if not verify_password(request.password, user.get("password", "")):
+        logger.warning(f"[Login] Password verification failed for: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
