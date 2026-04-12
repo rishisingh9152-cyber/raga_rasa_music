@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_HOURS: int = 24
     
-    # CORS Configuration - Production frontend URLs
+    # CORS Configuration - Production frontend URLs + Vercel preview deployments
     ALLOWED_ORIGINS_STR: str = "https://raga-rasa-music-52.vercel.app,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
     ALLOWED_METHODS: list = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     ALLOWED_HEADERS: list = ["Content-Type", "Authorization"]
@@ -60,9 +60,19 @@ class Settings(BaseSettings):
     @property
     def ALLOWED_ORIGINS(self) -> list:
         """Parse ALLOWED_ORIGINS from comma-separated string"""
-        if not self.ALLOWED_ORIGINS_STR:
-            return ["http://localhost:5173"]
-        return [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
+        origins = []
+        if self.ALLOWED_ORIGINS_STR:
+            origins = [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
+        else:
+            origins = ["http://localhost:5173"]
+        
+        # Add common Vercel URLs
+        origins.extend([
+            "https://raga-rasa-music-52.vercel.app",
+            "https://raga-rasa-music-52-*.vercel.app",
+        ])
+        
+        return list(set(origins))  # Remove duplicates
     
     # Storage Configuration - Use Cloudinary for production
     STORAGE_PROVIDER: str = "cloudinary"
