@@ -24,20 +24,36 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown"""
     # Startup
-    logger.info("Initializing song directories...")
-    initialize_directories()
+    logger.info("=" * 60)
+    logger.info("BACKEND STARTUP SEQUENCE")
+    logger.info("=" * 60)
     
-    logger.info("Initializing database...")
     try:
-        await init_db()
+        logger.info("Step 1: Initializing song directories...")
+        initialize_directories()
+        logger.info("✓ Song directories initialized")
     except Exception as e:
-        logger.error(f"Database initialization failed: {e}")
-        logger.warning("Continuing without database - some features may not work")
+        logger.warning(f"⚠ Song directory initialization failed: {e}")
     
-    logger.info("Initializing Redis cache...")
-    await init_redis()
+    try:
+        logger.info("Step 2: Initializing database...")
+        await init_db()
+        logger.info("✓ Database initialized")
+    except Exception as e:
+        logger.error(f"✗ Database initialization failed: {e}")
+        logger.warning("⚠ Continuing without database - some features may not work")
     
-    logger.info("Backend startup complete")
+    try:
+        logger.info("Step 3: Initializing Redis cache...")
+        await init_redis()
+        logger.info("✓ Redis cache initialized")
+    except Exception as e:
+        logger.warning(f"⚠ Redis initialization failed (optional): {e}")
+    
+    logger.info("=" * 60)
+    logger.info("✓ BACKEND STARTUP COMPLETE")
+    logger.info("=" * 60)
+    
     yield
     
     # Shutdown
@@ -100,8 +116,16 @@ async def root():
     return {
         "message": "Welcome to RagaRasa Music Therapy Backend",
         "docs": "/docs",
-        "openapi": "/openapi.json"
+        "openapi": "/openapi.json",
+        "health": "/health",
+        "version": "1.0.0"
     }
+
+
+@app.options("/{full_path:path}")
+async def preflight_handler(full_path: str):
+    """Handle CORS preflight requests"""
+    return {"message": "CORS preflight OK"}
 
 
 if __name__ == "__main__":
