@@ -19,17 +19,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/auth/test-db")
-async def test_db():
-    """Test database connection"""
-    db = get_db()
-    return {
-        "db_is_none": db is None,
-        "db_type": str(type(db)),
-        "message": "Database test endpoint"
-    }
-
-
 @router.post("/auth/register", response_model=TokenSchema)
 @limiter.limit(AUTH_RATE_LIMIT)
 async def register(request: RegisterSchema):

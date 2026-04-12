@@ -132,10 +132,16 @@ def create_access_token(user_id: str, email: str, role: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-    Verify plain password against hashed password.
+    Verify plain password against hashed password using bcrypt.
     """
-    import bcrypt
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    try:
+        import bcrypt
+        # Both should be strings - encode to bytes for bcrypt
+        result = bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+        return result
+    except Exception as e:
+        logger.error(f"Password verification error: {str(e)}")
+        return False
 
 
 def get_password_hash(password: str) -> str:
