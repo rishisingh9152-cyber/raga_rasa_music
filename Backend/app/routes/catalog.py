@@ -75,14 +75,17 @@ async def get_ragas_list(rasa: Optional[str] = None):
     """
     try:
         db = get_db()
+        logger.info(f"[Catalog] Database connection: {db}")
         
         # Build query
         query = {}
         if rasa:
             query["rasa"] = rasa
         
+        logger.info(f"[Catalog] Querying songs with filter: {query}")
         # Fetch ragas from database
         ragas = await db.songs.find(query).to_list(None)
+        logger.info(f"[Catalog] Found {len(ragas)} ragas")
         
         if not ragas:
             logger.warning(f"No ragas found with filter: {rasa}")
@@ -90,7 +93,7 @@ async def get_ragas_list(rasa: Optional[str] = None):
         
         # Convert to response schema with proper URLs
         raga_list = []
-        for raga in ragas:
+        for idx, raga in enumerate(ragas):
             try:
                 # Generate proper URL based on storage type
                 audio_url = raga.get("audio_url")
@@ -103,8 +106,11 @@ async def get_ragas_list(rasa: Optional[str] = None):
                     secs = duration % 60
                     duration = f"{mins}:{secs:02d}"
                 
+                song_id_val = raga.get("song_id", str(raga.get("_id", f"unknown_{idx}")))
+                logger.debug(f"[Catalog] Processing song {idx}: {raga.get('title')} (id: {song_id_val})")
+                
                 raga_item = RagaSchema(
-                    song_id=raga.get("song_id", str(raga.get("_id", ""))),
+                    song_id=song_id_val,
                     title=raga.get("title", ""),
                     rasa=raga.get("rasa", "Shaant"),
                     audio_url=audio_url or "/api/songs/stream/unknown",
@@ -116,11 +122,11 @@ async def get_ragas_list(rasa: Optional[str] = None):
                 logger.warning(f"Failed to convert raga {raga.get('title')}: {e}", exc_info=True)
                 continue
         
-        logger.info(f"Retrieved {len(raga_list)} ragas with filter: {rasa}")
+        logger.info(f"[Catalog] Retrieved {len(raga_list)} ragas with filter: {rasa}")
         return raga_list
         
     except Exception as e:
-        logger.error(f"Failed to fetch ragas list: {e}", exc_info=True)
+        logger.error(f"[Catalog] Failed to fetch ragas list: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to fetch ragas list: {str(e)}")
 
 
