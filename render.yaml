@@ -5,6 +5,7 @@ services:
     dockerfilePath: ./Dockerfile
     region: oregon
     plan: free
+    buildCommand: echo "Building RagaRasa Backend"
     envVars:
       - key: MONGODB_URL
         value: mongodb+srv://Rishi123:Rishi_123@majorproject.lpwzhzc.mongodb.net/?appName=MajorProject
