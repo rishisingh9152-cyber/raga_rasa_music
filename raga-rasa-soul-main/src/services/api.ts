@@ -214,7 +214,11 @@ export async function getSongsByRasa(): Promise<{ [key: string]: Song[] }> {
 
     const data = await response.json();
     console.log(`[API] Received songs organized by rasa:`, Object.keys(data));
-    return data;
+    
+    // Extract the by_rasa object from the response
+    const songsByRasa = data.by_rasa || data;
+    console.log(`[API] Songs organized by rasa:`, Object.keys(songsByRasa));
+    return songsByRasa;
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[API] getSongsByRasa error: ${errorMsg}`);

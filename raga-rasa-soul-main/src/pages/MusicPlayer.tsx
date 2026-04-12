@@ -219,7 +219,10 @@ const MusicPlayer = () => {
     if (aRecommended !== bRecommended) {
       return aRecommended ? -1 : 1;
     }
-    return a.title.localeCompare(b.title);
+    // Safe comparison with fallback for missing titles
+    const aTitle = a.title || "";
+    const bTitle = b.title || "";
+    return aTitle.localeCompare(bTitle);
   });
 
   const paginatedSongs = sortedSongs.slice(
