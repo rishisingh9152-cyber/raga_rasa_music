@@ -276,42 +276,6 @@ async def get_songs_by_rasa(rasa: Optional[str] = None) -> Dict:
     except Exception as e:
         logger.error(f"[ByRasa] Failed to fetch songs by rasa: {e}", exc_info=True)
         return {"error": str(e), "songs": [], "by_rasa": {}, "total": 0}
-        songs = await db.songs.find(query).to_list(None)
-        
-        # Organize by rasa
-        songs_data = {
-            "Shringar": [],
-            "Shaant": [],
-            "Veer": [],
-            "Shok": []
-        }
-        
-        for song in songs:
-            rasa_key = song.get("rasa", "Shaant")
-            
-            # Generate proper URL
-            audio_url = await _get_song_url(song)
-            
-            song_doc = {
-                "_id": song.get("_id", ""),
-                "title": song.get("title", ""),
-                "artist": song.get("artist", "Unknown"),
-                "rasa": rasa_key,
-                "audio_url": audio_url,
-                "duration": song.get("duration", "0:00"),
-                "rasa_confidence": song.get("rasa_confidence", 1.0),
-                "storage_metadata": song.get("storage_metadata")
-            }
-            
-            if rasa_key in songs_data:
-                songs_data[rasa_key].append(song_doc)
-        
-        logger.info(f"Returning {sum(len(v) for v in songs_data.values())} songs organized by rasa")
-        return songs_data
-        
-    except Exception as e:
-        logger.error(f"Failed to get songs by rasa: {e}")
-        raise HTTPException(status_code=500, detail="Failed to retrieve songs")
 
 
 @router.get("/songs/{song_id}", response_model=RagaSchema)
