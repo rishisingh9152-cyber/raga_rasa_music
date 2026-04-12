@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://raga-rasa-backend.onrender.com/api';
 
 interface User {
   user_id: string;
@@ -43,20 +43,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user');
       }
-    } else {
-      // AUTO-LOGIN: Set demo user for testing
-      const demoUser: User = {
-        user_id: 'admin_001',
-        email: 'rishisingh9152@gmail.com',
-        role: 'admin'
-      };
-      const demoToken = 'demo_token_for_testing';
-      setToken(demoToken);
-      setUser(demoUser);
-      localStorage.setItem('auth_token', demoToken);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${demoToken}`;
     }
+    // User remains null/unauthenticated until they login
 
     setIsLoading(false);
   }, []);
