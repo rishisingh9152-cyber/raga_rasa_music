@@ -133,38 +133,28 @@ def create_access_token(user_id: str, email: str, role: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify plain password against hashed password.
-    For now, support both hashed (bcrypt/passlib) and plain text passwords.
+    Supports: plain text, bcrypt, and passlib hashes.
     """
+    # Plain text comparison (simple fallback)
+    if plain_password == hashed_password:
+        return True
+    
+    # Try bcrypt
     try:
-        # First try passlib verification (for bcrypt hashes)
-        try:
-            from passlib.context import CryptContext
-            pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-            if pwd_context.verify(plain_password, hashed_password):
-                return True
-        except Exception as e:
-            logger.debug(f"Passlib verification failed: {e}")
-            pass
-        
-        # Try direct bcrypt
-        try:
-            import bcrypt
-            if bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8')):
-                return True
-        except Exception as e:
-            logger.debug(f"Bcrypt verification failed: {e}")
-            pass
-        
-        # Fallback to plain text comparison (for testing/migration)
-        if plain_password == hashed_password:
-            logger.warning(f"Using plain text password comparison - NOT SECURE!")
-            return True
-        
-        return False
-        
-    except Exception as e:
-        logger.error(f"Password verification error: {str(e)}")
-        return False
+        import bcrypt
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except:
+        pass
+    
+    # Try passlib
+    try:
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        return pwd_context.verify(plain_password, hashed_password)
+    except:
+        pass
+    
+    return False
 
 
 def get_password_hash(password: str) -> str:
