@@ -142,21 +142,6 @@ async def root():
     }
 
 
-@app.get("/db-test")
-async def db_test():
-    """Test database connection"""
-    from app.database import get_db
-    try:
-        db = get_db()
-        if not db:
-            return {"status": "error", "message": "Database not initialized"}
-        
-        count = await db.songs.count_documents({})
-        return {"status": "success", "total_songs": count}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-
 @app.options("/{full_path:path}")
 async def preflight_handler(full_path: str):
     """Handle CORS preflight requests"""
