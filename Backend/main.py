@@ -79,16 +79,11 @@ app.state.limiter = limiter
 # Pattern: https://*.vercel.app allows all Vercel preview and production deployments
 app.add_middleware(
     CustomCORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:8080",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:8080",
-    ],
-    allow_origin_regex=r"https://.*\.vercel\.app",  # Match all Vercel deployments
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origin_regex=settings.ALLOWED_ORIGINS_REGEX,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
+    allow_methods=settings.ALLOWED_METHODS,
+    allow_headers=settings.ALLOWED_HEADERS,
     expose_headers=["*"],
     max_age=3600,
 )

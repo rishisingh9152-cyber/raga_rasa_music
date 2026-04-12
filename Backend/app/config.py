@@ -63,8 +63,9 @@ class Settings(BaseSettings):
     
     # CORS Configuration - Production frontend URLs + Vercel preview deployments
     ALLOWED_ORIGINS_STR: str = "https://raga-rasa-music-52.vercel.app,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
-    ALLOWED_METHODS: list = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    ALLOWED_HEADERS: list = ["Content-Type", "Authorization"]
+    ALLOWED_ORIGINS_REGEX: str = r"https://.*\.vercel\.app"
+    ALLOWED_METHODS: list = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+    ALLOWED_HEADERS: list = ["*"]
     
     @property
     def ALLOWED_ORIGINS(self) -> list:
@@ -74,12 +75,6 @@ class Settings(BaseSettings):
             origins = [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
         else:
             origins = ["http://localhost:5173"]
-        
-        # Add common Vercel URLs
-        origins.extend([
-            "https://raga-rasa-music-52.vercel.app",
-            "https://raga-rasa-music-52-*.vercel.app",
-        ])
         
         return list(set(origins))  # Remove duplicates
     
