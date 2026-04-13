@@ -1,15 +1,25 @@
 # Use Python 3.10.13 slim image
 FROM python:3.10.13-slim
 
-# Build timestamp - change this to force rebuild
-# Build: 2026-04-13T07:25:00Z
+# Build timestamp - force rebuild
+# Build: 2026-04-13T07:35:00Z - CRITICAL: Headless OpenCV fix
 
 # Set working directory
 WORKDIR /app
 
+# Configure OpenCV for headless environment (no display server)
+# This prevents "libGL.so.1: cannot open shared object file" errors
+ENV DISPLAY=
+ENV LIBGL_ALWAYS_INDIRECT=1
+ENV QT_QPA_PLATFORM=offscreen
+
 # Install minimal system dependencies required for ML libraries
-# CRITICAL: libgl1-mesa-glx is REQUIRED for OpenCV (cv2) to work
-# These libraries are needed for emotion detection and image processing
+# CRITICAL LIBS:
+# - libgl1-mesa-glx: OpenGL Mesa (for headless OpenCV)
+# - libxext6, libxrender-dev: X11 libraries
+# - libsm6: For Tk support
+# - libgomp1: OpenMP threading
+# - libglib2.0-0: GLib runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -19,10 +29,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libgl1 \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    libsm6 \
+    libxext6 \
+    libnvidia-compute-470 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

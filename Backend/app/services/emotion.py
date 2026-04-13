@@ -1,6 +1,20 @@
 """Emotion detection service using ML models"""
 
+# CRITICAL: Configure environment BEFORE importing cv2
+import os
+import sys
+
+# Set OpenCV to headless mode (no display server needed)
+os.environ['DISPLAY'] = ''
+os.environ['LIBGL_ALWAYS_INDIRECT'] = '1'
+os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+os.environ['OPENCV_VIDEOIO_DEBUG'] = '0'
+
+# Now safe to import cv2
 import cv2
+cv2.setUseOptimized(False)
+cv2.setNumThreads(0)
+
 import numpy as np
 import base64
 from io import BytesIO
