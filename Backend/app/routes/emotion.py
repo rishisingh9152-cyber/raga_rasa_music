@@ -41,8 +41,6 @@ router = APIRouter()
 
 # Lazy-load detector only when first request arrives.
 _emotion_detector = None
-_local_model_ready = None
-_local_model_error = None
 
 
 def get_clean_emotion_service_lazy():
@@ -82,40 +80,6 @@ def get_emotion_detector_lazy():
     return _emotion_detector
 
 
-def warmup_emotion_models() -> dict:
-    """Warm up emotion models at startup and capture readiness status."""
-    global _local_model_ready, _local_model_error
-
-    _local_model_error = None
-    try:
-        local_detector = get_local_emotion_detector()
-        _local_model_ready = bool(local_detector._ensure_model())
-        if _local_model_ready:
-            logger.info("[Emotion] Local emotion model warmed up successfully")
-        else:
-            _local_model_error = getattr(local_detector, "_last_error", None) or "local_emotion_model_unavailable"
-            logger.warning("[Emotion] Local emotion model unavailable; fallback mode active")
-    except Exception as e:
-        _local_model_ready = False
-        _local_model_error = str(e)
-        logger.error(f"[Emotion] Local emotion warmup failed: {e}")
-
-    try:
-        detector = get_emotion_detector_lazy()
-        if detector is None:
-            logger.warning("[Emotion] Internal detector unavailable at warmup")
-        else:
-            logger.info("[Emotion] Internal detector initialized at warmup")
-    except Exception as e:
-        logger.error(f"[Emotion] Internal detector warmup failed: {e}")
-
-    return {
-        "local_model_ready": bool(_local_model_ready),
-        "local_model_error": _local_model_error,
-        "internal_detector_ready": _emotion_detector is not None,
-    }
-
-
 async def detect_with_local_emotion_module(image_base64: str):
     """Use in-process local emotion_recognition module (no separate server)."""
     detector = get_local_emotion_detector()
@@ -144,7 +108,8 @@ async def emotion_service_health():
     """Health check for integrated backend detector."""
 
     try:
-        local_ready = bool(_local_model_ready)
+        local_detector = get_local_emotion_detector()
+        local_ready = bool(local_detector._ensure_model())
         detector = get_emotion_detector_lazy()
         if not local_ready and detector is None:
             return {
@@ -152,7 +117,7 @@ async def emotion_service_health():
                 "service": "internal_emotion_recognition",
                 "mode": "fallback_neutral",
                 "external_service_used": False,
-                "reason": _local_model_error or "model_unavailable",
+                "reason": getattr(local_detector, "_last_error", None) or "model_unavailable",
             }
 
         is_healthy = local_ready or bool(getattr(detector, "recognizer", None) or getattr(detector, "detector", None))
@@ -206,20 +171,26 @@ async def detect_emotion(request: EmotionDetectRequest):
                 raw_dominant=str(cached_emotion).lower(),
             )
 
-        local_ready = bool(_local_model_ready) if _local_model_ready is not None else False
-        if local_ready:
-            try:
-                # Primary path: integrated local emotion_recognition module (no separate server)
-                emotion, confidence = await asyncio.wait_for(
-                    detect_with_local_emotion_module(image_base64),
-                    timeout=10.0,
-                )
-            except Exception as local_err:
-                logger.warning(f"[Emotion] Integrated local module failed: {local_err}")
+        # Primary path: integrated local emotion_recognition module (no separate server)
+        try:
+            emotion, confidence = await asyncio.wait_for(
+                detect_with_local_emotion_module(image_base64),
+                timeout=10.0,
+            )
+        except Exception as local_err:
+            logger.warning(f"[Emotion] Integrated local module failed: {local_err}")
+            detector = get_emotion_detector_lazy()
+            if detector is None:
                 emotion, confidence = "Neutral", 0.5
-        else:
-            logger.warning(f"[Emotion] Local model not ready, using neutral fallback: {_local_model_error}")
-            emotion, confidence = "Neutral", 0.5
+            else:
+                try:
+                    emotion, confidence = await asyncio.wait_for(
+                        detector.detect_from_base64(image_base64),
+                        timeout=8.0,
+                    )
+                except Exception as detection_err:
+                    logger.warning(f"[Emotion] Internal detector fallback failed: {detection_err}")
+                    emotion, confidence = "Neutral", 0.5
 
         threshold = getattr(settings, "EMOTION_CONFIDENCE_THRESHOLD", 0.3)
         if confidence < threshold:

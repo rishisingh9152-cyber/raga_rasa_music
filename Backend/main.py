@@ -11,7 +11,6 @@ import logging
 from app.config import settings
 from app.database import init_db, close_db
 from app.routes import session, emotion, recommendation, rating, history, catalog, upload, psychometric, images, auth
-from app.routes.emotion import warmup_emotion_models
 from app.services.cache import init_redis
 from app.services.song_upload import initialize_directories
 from app.services.rate_limiting import limiter
@@ -52,14 +51,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"⚠ Redis initialization failed (optional): {e}")
 
-    try:
-        logger.info("Step 4: Warming up emotion models...")
-        warmup = warmup_emotion_models()
-        logger.info(f"✓ Emotion warmup complete: {warmup}")
-    except Exception as e:
-        logger.error(f"✗ Emotion warmup failed: {e}")
-        logger.warning("⚠ Continuing with fallback emotion mode")
-    
     logger.info("=" * 60)
     logger.info("✓ BACKEND STARTUP COMPLETE")
     logger.info("=" * 60)
