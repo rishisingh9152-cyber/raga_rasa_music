@@ -33,6 +33,11 @@ const LiveSession = () => {
   const [currentPlayingSongId, setCurrentPlayingSongId] = useState<string | null>(null);
   const [currentPlayingSong, setCurrentPlayingSong] = useState<any | null>(null);
 
+  const getSongId = (song: any): string => {
+    if (!song) return "";
+    return song.song_id || song._id || "";
+  };
+
   // useEffect 1: Start session on mount
   useEffect(() => {
     const initSession = async () => {
@@ -193,7 +198,7 @@ const LiveSession = () => {
       }
 
       setCurrentAudio(audioRef.current);
-      setCurrentPlayingSongId(song.song_id);
+      setCurrentPlayingSongId(getSongId(song));
       setCurrentPlayingSong(song);
     } catch (err) {
       console.error("[Playback] Error:", err);
@@ -276,19 +281,19 @@ const LiveSession = () => {
             <p className="text-xs text-muted-foreground">Loading recommendations...</p>
           ) : session.recommended_songs && session.recommended_songs.length > 0 ? (
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {session.recommended_songs.map(song => (
-                <div
-                  key={song.song_id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                    currentPlayingSongId === song.song_id
-                      ? "bg-primary/10 border-primary"
-                      : "bg-muted/30 border-border hover:border-primary/50"
-                  }`}
-                >
-                  <button
-                    onClick={() =>
-                      currentPlayingSongId === song.song_id ? pauseSong() : playSong(song)
-                    }
+               {session.recommended_songs.filter(Boolean).map(song => (
+                 <div
+                   key={getSongId(song)}
+                   className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                     currentPlayingSongId === getSongId(song)
+                       ? "bg-primary/10 border-primary"
+                       : "bg-muted/30 border-border hover:border-primary/50"
+                   }`}
+                 >
+                   <button
+                     onClick={() =>
+                       currentPlayingSongId === getSongId(song) ? pauseSong() : playSong(song)
+                     }
                     className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/20 hover:bg-primary/30 flex items-center justify-center text-primary transition-colors"
                   >
                     {currentPlayingSongId === song.song_id ? "⏸" : "▶"}

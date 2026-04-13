@@ -27,8 +27,8 @@ def get_emotion_detector_lazy():
         try:
             from app.services.emotion import get_emotion_detector
             _emotion_detector = get_emotion_detector()
-        except ImportError as e:
-            logger.error(f"[Emotion] Failed to load emotion detector: {e}")
+        except Exception as e:
+            logger.error(f"[Emotion] Failed to initialize internal detector: {e}")
             # Do not fail hard in production; caller will use Neutral fallback
             return None
     return _emotion_detector
