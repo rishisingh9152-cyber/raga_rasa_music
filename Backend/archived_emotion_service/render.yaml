@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: raga-rasa-emotion-recognition
+    runtime: python
+    buildCommand: pip install -r emotion_recognition/requirements.txt
+    startCommand: cd emotion_recognition && gunicorn --workers 1 --worker-class sync --bind 0.0.0.0:$PORT --timeout 300 api:app
+    region: oregon
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.10.15"
+      - key: PORT
+        value: "5000"
+      - key: DEBUG
+        value: "false"
