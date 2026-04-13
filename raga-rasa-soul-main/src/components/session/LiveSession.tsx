@@ -50,10 +50,10 @@ const LiveSession = () => {
       }
     };
 
-    if (!session.session_id) {
+    if (session.step === "live" && !session.session_id) {
       initSession();
     }
-  }, []);
+  }, [session.step, session.session_id]);
 
   // useEffect 2: Request camera access
   useEffect(() => {
@@ -264,8 +264,12 @@ const LiveSession = () => {
           )}
 
           {!session.detected_emotion && (
-            <button onClick={handleCaptureEmotion} disabled={emotionLoading || !webcamActive} className="glow-button w-full">
-              {emotionLoading ? "Detecting..." : "Capture Emotion"}
+            <button
+              onClick={handleCaptureEmotion}
+              disabled={emotionLoading || !webcamActive || !session.session_id}
+              className="glow-button w-full"
+            >
+              {emotionLoading ? "Detecting..." : session.session_id ? "Capture Emotion" : "Initializing Session..."}
             </button>
           )}
         </motion.div>
@@ -296,7 +300,7 @@ const LiveSession = () => {
                      }
                     className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/20 hover:bg-primary/30 flex items-center justify-center text-primary transition-colors"
                   >
-                    {currentPlayingSongId === song.song_id ? "⏸" : "▶"}
+                     {currentPlayingSongId === getSongId(song) ? "⏸" : "▶"}
                   </button>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs sm:text-sm font-medium truncate">{song.title}</p>

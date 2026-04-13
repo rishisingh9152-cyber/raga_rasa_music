@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     
     # Storage Configuration - Use Cloudinary for production
     STORAGE_PROVIDER: str = "cloudinary"
-    STORAGE_BASE_PATH: str = "./Songs/"
+    STORAGE_BASE_PATH: str = os.getenv("STORAGE_BASE_PATH", "/tmp/Songs")
     
     # Cloudinary Configuration - Use environment variables (optional storage)
     CLOUDINARY_CLOUD_NAME: Optional[str] = os.getenv("CLOUDINARY_CLOUD_NAME")
