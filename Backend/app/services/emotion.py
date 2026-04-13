@@ -28,7 +28,7 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 # Thread pool for CPU-intensive ML operations
-executor = ThreadPoolExecutor(max_workers=4)
+executor = ThreadPoolExecutor(max_workers=1)
 
 # SSL bypass for HSEmotion model downloads
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -136,18 +136,9 @@ class EmotionDetector:
             except Exception as fer_err:
                 logger.warning(f"[Emotion] FER failed: {fer_err}, trying DeepFace...")
             
-            # Fallback to DeepFace
-            try:
-                import deepface
-                self.detector = deepface
-                self.model_type = 'deepface'
-                logger.info("[Emotion] DeepFace model initialized successfully")
-                return
-                
-            except Exception as df_err:
-                logger.error(f"[Emotion] All emotion models failed: {df_err}")
-                logger.warning("[Emotion] Emotion detection will fallback to Neutral")
-                self.detector = None
+            # Skip DeepFace in production path due heavy dependencies/runtime instability
+            logger.error("[Emotion] HSEmotion and FER unavailable; detector fallback will be used")
+            self.detector = None
                 
         except Exception as e:
             logger.error(f"[Emotion] Unexpected error during model initialization: {e}")
