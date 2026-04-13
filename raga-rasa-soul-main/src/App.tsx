@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import MusicPlayer from "./pages/MusicPlayer";
 import Session from "./pages/Session";
 import SongUpload from "./pages/SongUpload";
+import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,8 +27,9 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* Auto-redirect to dashboard on app load */}
-              <Route path="/" element={<Navigate to="/dashboard/home" replace />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Navigate to="/dashboard/home" replace />} />
+              <Route path="/register" element={<Navigate to="/dashboard/home" replace />} />
               
               {/* Protected dashboard routes */}
               <Route

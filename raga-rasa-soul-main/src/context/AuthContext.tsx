@@ -1,7 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://raga-rasa-backend.onrender.com/api';
 
 interface User {
   user_id: string;
@@ -27,106 +24,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize auth from localStorage on mount
+  // No-auth mode: always initialize a guest user.
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('user');
-
-    if (storedToken && storedUser) {
-      try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        // Set axios default header
-        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-      } catch (err) {
-        // Invalid stored data
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-      }
-    }
-    // User remains null/unauthenticated until they login
-
+    const guestUser: User = {
+      user_id: 'guest',
+      email: 'guest@local',
+      role: 'admin',
+    };
+    setUser(guestUser);
+    setToken('guest-token');
+    localStorage.setItem('user', JSON.stringify(guestUser));
+    localStorage.setItem('auth_token', 'guest-token');
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-        email,
-        password,
-      });
-
-      const { access_token, user: userData } = response.data;
-
-      // Store token and user
-      localStorage.setItem('auth_token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // Set axios default header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-      setToken(access_token);
-      setUser(userData);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
+  const login = async (_email: string, _password: string) => {
+    return;
   };
 
-  const register = async (email: string, password: string) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
-        email,
-        password,
-      });
-
-      const { access_token, user: userData } = response.data;
-
-      // Store token and user
-      localStorage.setItem('auth_token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // Set axios default header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-      setToken(access_token);
-      setUser(userData);
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    }
+  const register = async (_email: string, _password: string) => {
+    return;
   };
 
-  const setupAdmin = async (email: string, password: string) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/setup-admin`, {
-        email,
-        password,
-      });
-
-      const { access_token, user: userData } = response.data;
-
-      // Store token and user
-      localStorage.setItem('auth_token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // Set axios default header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-      setToken(access_token);
-      setUser(userData);
-    } catch (error) {
-      console.error('Setup admin error:', error);
-      throw error;
-    }
+  const setupAdmin = async (_email: string, _password: string) => {
+    return;
   };
 
   const logout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
-    setToken(null);
-    setUser(null);
+    // No-auth mode keeps app accessible; reset to guest identity.
+    const guestUser: User = {
+      user_id: 'guest',
+      email: 'guest@local',
+      role: 'admin',
+    };
+    localStorage.setItem('auth_token', 'guest-token');
+    localStorage.setItem('user', JSON.stringify(guestUser));
+    setToken('guest-token');
+    setUser(guestUser);
   };
 
   const value: AuthContextType = {

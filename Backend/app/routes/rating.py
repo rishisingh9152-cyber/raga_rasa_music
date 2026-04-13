@@ -21,8 +21,12 @@ class RateSongRequest(BaseModel):
     user_id: Optional[str] = None  # Optional - will use JWT if available
     song_id: str
     rating: int = Field(..., ge=1, le=5, description="Rating 1-5 stars")
-    session_id: str
+    session_id: Optional[str] = None
     feedback: Optional[FeedbackSchema] = None
+    # Backward-compat support for older frontend payloads
+    song_title: Optional[str] = None
+    rasa: Optional[str] = None
+    comments: Optional[str] = None
 
 
 class SimpleSongRatingRequest(BaseModel):
@@ -59,6 +63,19 @@ async def rate_song_detailed(
     try:
         db = get_db()
         
+        # Backward compatibility: allow older payload style to be processed
+        if request.session_id is None:
+            simple_request = SimpleSongRatingRequest(
+                song_id=request.song_id,
+                song_title=request.song_title or request.song_id,
+                rasa=request.rasa or "Shaant",
+                rating=request.rating,
+                session_id=None,
+                feedback_text=request.comments,
+                user_id=request.user_id,
+            )
+            return await rate_song_simple(simple_request, current_user)
+
         # Use JWT user_id if available, otherwise use provided user_id
         user_id = current_user.get("user_id") if current_user else request.user_id
         

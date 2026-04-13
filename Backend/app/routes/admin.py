@@ -217,19 +217,23 @@ async def delete_song(song_id: str, current_user: Dict[str, Any] = Depends(requi
     db = get_db()
     
     try:
-        # Check if song exists
+        # Check if song exists (support both logical song_id and Mongo _id styles)
         song = await db.songs.find_one({"song_id": song_id})
+        if not song:
+            song = await db.songs.find_one({"_id": song_id})
         if not song:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Song not found"
             )
         
-        # Delete song
-        await db.songs.delete_one({"song_id": song_id})
+        # Delete song by exact stored identifier
+        delete_query = {"_id": song.get("_id")} if song.get("_id") is not None else {"song_id": song_id}
+        await db.songs.delete_one(delete_query)
         
         # Also delete associated ratings
-        await db.ratings.delete_many({"song_id": song_id})
+        rating_song_id = song.get("song_id", song_id)
+        await db.ratings.delete_many({"song_id": rating_song_id})
         
         logger.info(f"Admin {current_user.get('user_id')} deleted song {song_id}")
         
@@ -262,11 +266,14 @@ async def list_songs(current_user: Dict[str, Any] = Depends(require_admin), skip
     
     try:
         songs = await db.songs.find({}).skip(skip).limit(limit).to_list(limit)
-        
-        # Remove MongoDB ObjectId
+
+        # Normalize identifiers for frontend compatibility
         for song in songs:
-            if "_id" in song:
-                del song["_id"]
+            raw_id = song.get("_id")
+            if raw_id is not None:
+                song["_id"] = str(raw_id)
+            if not song.get("song_id") and raw_id is not None:
+                song["song_id"] = str(raw_id)
         
         total_count = await db.songs.count_documents({})
         

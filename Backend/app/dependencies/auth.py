@@ -22,11 +22,8 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
     Raises 401 if no valid token provided.
     """
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        # No-auth mode: allow anonymous requests
+        return {"user_id": None, "email": "anonymous@local", "role": "admin"}
     
     token = credentials.credentials
     
@@ -58,24 +55,16 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
         )
         
     except JWTError as e:
-        logger.error(f"JWT validation failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        logger.warning(f"JWT validation failed, falling back to anonymous user: {str(e)}")
+        return {"user_id": None, "email": "anonymous@local", "role": "admin"}
     
     # Fetch user from database to ensure they still exist
     db = get_db()
     user = await db.users.find_one({"user_id": user_id})
     
     if user is None:
-        logger.warning(f"User not found: {user_id}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        logger.warning(f"User not found: {user_id}, falling back to anonymous user")
+        return {"user_id": None, "email": "anonymous@local", "role": "admin"}
     
     # Convert MongoDB ObjectId to string if needed
     if "_id" in user:
@@ -88,13 +77,7 @@ async def require_admin(current_user: Dict[str, Any] = Depends(get_current_user)
     """
     Dependency to ensure current user is an admin.
     """
-    if current_user.get("role") != "admin":
-        logger.warning(f"Non-admin user attempted admin access: {current_user.get('user_id')}")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-    
+    # No-auth mode: admin checks disabled
     return current_user
 
 

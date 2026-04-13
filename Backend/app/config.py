@@ -62,7 +62,13 @@ class Settings(BaseSettings):
     JWT_EXPIRATION_HOURS: int = 24
     
     # CORS Configuration - Production frontend URLs + Vercel preview deployments
-    ALLOWED_ORIGINS_STR: str = "https://raga-rasa-music-52.vercel.app,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
+    ALLOWED_ORIGINS_STR: str = os.getenv(
+        "ALLOWED_ORIGINS_STR",
+        os.getenv(
+            "ALLOWED_ORIGINS",
+            "https://raga-rasa-music-52.vercel.app,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
+        )
+    )
     ALLOWED_ORIGINS_REGEX: str = r"https://.*\.vercel\.app"
     ALLOWED_METHODS: list = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
     ALLOWED_HEADERS: list = ["*"]

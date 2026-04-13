@@ -1,8 +1,4 @@
-// API Base URL - configurable via environment variable
-// IMPORTANT: Must include /api suffix or full URL with /api
-// In production: use VITE_API_BASE_URL env variable
-// Fallback for dev: uses relative /api (proxied in vite.config.ts to http://localhost:8000/api)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+import { API_BASE_URL } from "@/lib/apiBase";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -218,10 +214,24 @@ export async function getSongsByRasa(): Promise<{ [key: string]: Song[] }> {
     const data = await response.json();
     console.log(`[API] Received response with keys:`, Object.keys(data));
     
-    // Extract the by_rasa object from the response
-    // The backend returns { songs: [...], by_rasa: { Shaant: [...], ... }, total: N }
-    // We need to extract just the by_rasa part for the frontend
-    const songsByRasa = data.by_rasa || data;
+    let songsByRasa: { [key: string]: Song[] } = {};
+
+    // Support both response shapes:
+    // 1) { by_rasa: { Shaant: [...], ... } }
+    // 2) [{...song}, {...song}] (list response)
+    if (Array.isArray(data)) {
+      songsByRasa = data.reduce((acc: { [key: string]: Song[] }, song: Song) => {
+        const rasaKey = song.rasa || "Shaant";
+        if (!acc[rasaKey]) acc[rasaKey] = [];
+        acc[rasaKey].push(song);
+        return acc;
+      }, {});
+    } else if (data?.by_rasa && typeof data.by_rasa === "object") {
+      songsByRasa = data.by_rasa;
+    } else if (data && typeof data === "object") {
+      songsByRasa = data;
+    }
+
     console.log(`[API] Extracted songs by rasa - keys:`, Object.keys(songsByRasa));
     
     // Validate that we have proper structure
@@ -252,7 +262,7 @@ export async function submitSongRating(
   try {
     console.log(`[API] Submitting rating for song: ${song_title}`);
     
-    const response = await fetch(`${API_BASE_URL}/rate`, {
+    const response = await fetch(`${API_BASE_URL}/rate-song`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -260,7 +270,7 @@ export async function submitSongRating(
         song_title,
         rasa,
         rating,
-        comments: comments || ""
+        feedback_text: comments || ""
       })
     });
 

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/apiBase";
 
 const RASAS = ["Shaant", "Shringar", "Veer", "Shok"];
 
@@ -57,14 +58,16 @@ const SongUpload = () => {
     setUploadData(prev => ({ ...prev, step: "uploading" }));
 
     try {
+      const token = localStorage.getItem("auth_token");
       const formData = new FormData();
       formData.append("file", uploadData.file);
       formData.append("title", uploadData.title);
       formData.append("artist", uploadData.artist || "Unknown");
       formData.append("emotion", "Neutral");
 
-      const response = await fetch("/api/songs/upload", {
+      const response = await fetch(`${API_BASE_URL}/songs/upload`, {
         method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       });
 
@@ -110,13 +113,17 @@ const SongUpload = () => {
     setUploadData(prev => ({ ...prev, step: "uploading" }));
 
     try {
+       const token = localStorage.getItem("auth_token");
        const response = await fetch(
-         "/api/songs/confirm-upload",
+         `${API_BASE_URL}/songs/confirm-upload`,
          {
-           method: "POST",
-           headers: { "Content-Type": "application/json" },
-           body: JSON.stringify({
-             temp_path: uploadData.tempPath,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              temp_path: uploadData.tempPath,
              title: uploadData.title,
              artist: uploadData.artist || "Unknown",
              rasa: selectedRasa,

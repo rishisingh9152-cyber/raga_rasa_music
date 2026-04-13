@@ -171,7 +171,7 @@ async def get_songs_by_rasa(rasa: Optional[str] = None):
         List of songs (ragas) with audio URLs
     """
     logger.info(f"[Catalog] GET /songs/by-rasa endpoint called (rasa={rasa})")
-    # Delegate to existing get_ragas_list function
+    # Delegate to canonical list endpoint for stable response shape
     return await get_ragas_list(rasa=rasa)
 
 
@@ -231,8 +231,8 @@ async def get_raga_details(raga_id: str):
         raise HTTPException(status_code=500, detail="Failed to fetch raga details")
 
 
-@router.get("/songs/by-rasa")
-async def get_songs_by_rasa(rasa: Optional[str] = None) -> Dict:
+@router.get("/songs/by-rasa-grouped")
+async def get_songs_by_rasa_grouped(rasa: Optional[str] = None) -> Dict:
     """
     Get all songs organized by rasa with cloud-aware URLs
     

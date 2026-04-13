@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://raga-rasa-backend.onrender.com/api';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
