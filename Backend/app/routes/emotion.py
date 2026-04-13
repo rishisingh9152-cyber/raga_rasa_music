@@ -11,7 +11,7 @@ from app.services.rasa_model import get_rasa_model
 from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
 from app.config import settings
-from app.services.external_emotion import get_emotion_service_client
+from archived_emotion_service.api import detect_emotion_from_base64
 
 logger = logging.getLogger(__name__)
 
@@ -51,10 +51,9 @@ def get_emotion_detector_lazy():
     return _emotion_detector
 
 
-async def detect_with_external_service(image_base64: str):
-    """Use external emotion_recognition service endpoint."""
-    client = get_emotion_service_client()
-    emotion_raw, confidence = await client.predict_emotion(image_base64)
+async def detect_with_integrated_archived_module(image_base64: str):
+    """Use archived_emotion_service as in-process backend module (no separate server)."""
+    emotion_raw, confidence, _ = await asyncio.to_thread(detect_emotion_from_base64, image_base64)
     emotion_map = {
         "happy": "Happy",
         "neutral": "Neutral",
@@ -82,7 +81,7 @@ async def emotion_service_health():
                 "status": "degraded",
                 "service": "internal_emotion_recognition",
                 "mode": "fallback_neutral",
-                "external_service_used": settings.USE_EXTERNAL_EMOTION_SERVICE,
+                "external_service_used": False,
             }
 
         is_healthy = bool(getattr(detector, "recognizer", None) or getattr(detector, "detector", None))
@@ -91,14 +90,14 @@ async def emotion_service_health():
             "service": "internal_emotion_recognition",
             "model_type": getattr(detector, "model_type", "unknown"),
             "fallback_available": True,
-            "external_service_used": settings.USE_EXTERNAL_EMOTION_SERVICE,
+            "external_service_used": False,
         }
     except Exception as e:
         logger.error(f"[Emotion] Health check failed: {e}")
         return {
             "status": "error",
             "service": "internal_emotion_recognition",
-            "external_service_used": settings.USE_EXTERNAL_EMOTION_SERVICE,
+            "external_service_used": False,
             "error": str(e),
         }
 
@@ -123,40 +122,30 @@ async def detect_emotion(request: EmotionDetectRequest):
             )
 
         detector = get_emotion_detector_lazy()
-        if settings.USE_EXTERNAL_EMOTION_SERVICE:
-            try:
-                emotion, confidence = await asyncio.wait_for(
-                    detect_with_external_service(image_base64),
-                    timeout=10.0,
-                )
-            except Exception as external_err:
-                logger.warning(f"[Emotion] External emotion service failed: {external_err}")
-                if detector is None:
-                    emotion, confidence = "Neutral", 0.5
-                else:
-                    try:
-                        emotion, confidence = await asyncio.wait_for(
-                            detector.detect_from_base64(image_base64),
-                            timeout=8.0,
-                        )
-                    except Exception as detection_err:
-                        logger.warning(f"[Emotion] Internal fallback failed: {detection_err}")
-                        emotion, confidence = "Neutral", 0.5
-        elif detector is None:
-            emotion = "Neutral"
-            confidence = 0.5
-        else:
-            try:
-                emotion, confidence = await asyncio.wait_for(
-                    detector.detect_from_base64(image_base64),
-                    timeout=8.0,
-                )
-                threshold = getattr(settings, "EMOTION_CONFIDENCE_THRESHOLD", 0.3)
-                if confidence < threshold:
-                    emotion = "Neutral"
-            except Exception as detection_err:
-                logger.warning(f"[Emotion] Detection failed, using fallback: {detection_err}")
+        try:
+            # Primary path: integrated archived emotion_recognition module (no separate server)
+            emotion, confidence = await asyncio.wait_for(
+                detect_with_integrated_archived_module(image_base64),
+                timeout=10.0,
+            )
+        except Exception as archived_err:
+            logger.warning(f"[Emotion] Integrated archived module failed: {archived_err}")
+            if detector is None:
                 emotion, confidence = "Neutral", 0.5
+            else:
+                try:
+                    # Secondary path: internal detector module
+                    emotion, confidence = await asyncio.wait_for(
+                        detector.detect_from_base64(image_base64),
+                        timeout=8.0,
+                    )
+                except Exception as detection_err:
+                    logger.warning(f"[Emotion] Internal detector fallback failed: {detection_err}")
+                    emotion, confidence = "Neutral", 0.5
+
+        threshold = getattr(settings, "EMOTION_CONFIDENCE_THRESHOLD", 0.3)
+        if confidence < threshold:
+            emotion = "Neutral"
 
         emotion = (emotion or "Neutral").title()
 

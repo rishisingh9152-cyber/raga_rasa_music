@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     REDIS_CACHE_EXPIRY: int = 3600  # 1 hour
     
     # External Emotion Recognition Service
-    USE_EXTERNAL_EMOTION_SERVICE: bool = os.getenv("USE_EXTERNAL_EMOTION_SERVICE", "true").lower() == "true"
+    USE_EXTERNAL_EMOTION_SERVICE: bool = False
     EMOTION_SERVICE_URL: str = os.getenv(
         "EMOTION_SERVICE_URL",
         "http://localhost:5000"  # Local dev default
