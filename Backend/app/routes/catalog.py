@@ -99,6 +99,8 @@ async def get_ragas_list(rasa: Optional[str] = None):
     """
     try:
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         logger.info(f"[Catalog] Database connection: {db}")
         
         # Build query

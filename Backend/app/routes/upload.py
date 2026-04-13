@@ -161,6 +161,8 @@ async def confirm_upload(
         
         # Step 2: Store in database with metadata
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # Create storage metadata
         storage_metadata = {
@@ -176,8 +178,11 @@ async def confirm_upload(
             storage_metadata["cloud_object_key"] = move_result.get("final_path")
             storage_metadata["cloud_url"] = move_result.get("cloud_url")
         
+        generated_song_id = f"song_{title.lower().replace(' ', '_')}_{rasa}_{str(uuid.uuid4())[:8]}"
+
         song_data = {
-            "_id": f"song_{title.lower().replace(' ', '_')}_{rasa}_{str(uuid.uuid4())[:8]}",
+            "_id": generated_song_id,
+            "song_id": generated_song_id,
             "title": title,
             "artist": artist or "Unknown",
             "rasa": rasa,

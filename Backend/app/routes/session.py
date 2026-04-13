@@ -102,6 +102,8 @@ async def get_session(session_id: str, current_user: Dict[str, Any] = Depends(ge
     """
     try:
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         session = await db.sessions.find_one({"_id": session_id})
         
@@ -142,6 +144,8 @@ async def list_sessions(
     """
     try:
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # In no-auth mode, list all sessions; otherwise scope to user
         current_user_id = current_user.get("user_id")
@@ -189,6 +193,8 @@ async def update_session_emotion(session_id: str, emotion: str, rasa: str, confi
             raise HTTPException(status_code=400, detail="Confidence must be between 0 and 1")
         
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # Verify session exists and user owns it
         session = await db.sessions.find_one({"_id": session_id})
@@ -245,6 +251,8 @@ async def add_song_to_session(session_id: str, song_id: str, song_type: str = "p
             raise HTTPException(status_code=400, detail="song_type must be 'played' or 'recommended'")
         
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # Verify session exists and user owns it
         session = await db.sessions.find_one({"_id": session_id})
@@ -293,6 +301,8 @@ async def complete_session(session_id: str, feedback: Optional[dict] = None, cur
     """
     try:
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         # Verify session exists and user owns it
         session = await db.sessions.find_one({"_id": session_id})
@@ -354,6 +364,8 @@ async def get_session_summary(session_id: str, current_user: Dict[str, Any] = De
     """
     try:
         db = get_db()
+        if db is None:
+            raise HTTPException(status_code=503, detail="Database service unavailable")
         
         session = await db.sessions.find_one({"_id": session_id})
         
