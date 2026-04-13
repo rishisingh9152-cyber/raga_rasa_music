@@ -165,6 +165,10 @@ class FeedbackSchema(BaseModel):
     """User feedback on session or song"""
     feedback_text: Optional[str] = None
     rating: Optional[int] = Field(None, ge=1, le=5, description="Optional 1-5 rating")
+    # Frontend session feedback shape
+    mood_after: Optional[str] = None
+    session_rating: Optional[int] = Field(None, ge=1, le=5)
+    comment: Optional[str] = None
     timestamp: Optional[datetime] = None
 
 
@@ -184,6 +188,11 @@ class SessionHistorySchema(BaseModel):
 
 class CognitiveDataSchema(BaseModel):
     """Cognitive assessment data (pre/post session)"""
+    # Frontend live/final recommendation shape
+    memory_score: Optional[float] = None
+    reaction_time: Optional[float] = None
+    accuracy_score: Optional[float] = None
+    # Legacy/extended schema
     pre_test_id: Optional[str] = None
     post_test_id: Optional[str] = None
     pre_test: Optional[PsychometricTestDataSchema] = None

@@ -143,8 +143,9 @@ async def list_sessions(
     try:
         db = get_db()
         
-        # Always filter by current user's ID
-        query = {"user_id": current_user.get("user_id")}
+        # In no-auth mode, list all sessions; otherwise scope to user
+        current_user_id = current_user.get("user_id")
+        query = {} if not current_user_id else {"user_id": current_user_id}
         if status:
             query["status"] = status
         

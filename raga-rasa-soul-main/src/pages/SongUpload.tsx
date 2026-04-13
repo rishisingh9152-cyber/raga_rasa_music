@@ -58,7 +58,6 @@ const SongUpload = () => {
     setUploadData(prev => ({ ...prev, step: "uploading" }));
 
     try {
-      const token = localStorage.getItem("auth_token");
       const formData = new FormData();
       formData.append("file", uploadData.file);
       formData.append("title", uploadData.title);
@@ -67,7 +66,6 @@ const SongUpload = () => {
 
       const response = await fetch(`${API_BASE_URL}/songs/upload`, {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       });
 
@@ -113,14 +111,12 @@ const SongUpload = () => {
     setUploadData(prev => ({ ...prev, step: "uploading" }));
 
     try {
-       const token = localStorage.getItem("auth_token");
        const response = await fetch(
          `${API_BASE_URL}/songs/confirm-upload`,
          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
             body: JSON.stringify({
               temp_path: uploadData.tempPath,

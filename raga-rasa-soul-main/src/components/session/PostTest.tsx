@@ -62,7 +62,7 @@ const PostTest = () => {
 
       const feedback = {
         mood_after: `${mood}`,
-        session_rating: 0,
+        session_rating: 3,
         comment: ""
       };
 

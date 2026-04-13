@@ -24,26 +24,22 @@ const Profile = () => {
   // Load user data on component mount
   useEffect(() => {
     const loadUserData = async () => {
-      if (!isAuthenticated || !token) {
-        setError("Please log in to view your profile");
-        setIsLoading(false);
-        return;
-      }
+      const authToken = token || localStorage.getItem("auth_token") || "guest-token";
 
       try {
         setIsLoading(true);
         setError(null);
 
         // Fetch session history
-        const sessions = await getUserSessionHistory(token);
+        const sessions = await getUserSessionHistory(authToken);
         setSessionHistory(sessions);
 
         // Calculate user stats
-        const stats = await calculateUserStats(token);
+        const stats = await calculateUserStats(authToken);
         setUserStats(stats);
 
         // Get mood trends
-        const trends = await getMoodTrends(token);
+        const trends = await getMoodTrends(authToken);
         setMoodTrends(trends);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Failed to load profile data";
@@ -111,21 +107,6 @@ const Profile = () => {
     .map(([name, data]) => ({ name, emotion: data.emotion, count: data.count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
-
-  if (!isAuthenticated) {
-    return (
-      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 pb-6">
-        <motion.div {...anim(0)}>
-          <h1 className="section-title text-xl sm:text-2xl mb-1">Your Profile</h1>
-          <p className="text-muted-foreground text-sm">Analytics and session history</p>
-        </motion.div>
-        <motion.div {...anim(1)} className="glass-card p-6 text-center">
-          <AlertCircle className="w-8 h-8 mx-auto mb-4 text-warning" />
-          <p className="text-foreground">Please log in to view your profile</p>
-        </motion.div>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
