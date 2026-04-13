@@ -1,6 +1,6 @@
 """Emotion detection endpoints integrated in backend (no external service)."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
 import logging
 import traceback
@@ -12,6 +12,7 @@ from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
 from app.config import settings
 from app.services.emotion_recognition_local import get_local_emotion_detector
+from app.services.clean_emotion_service import get_clean_emotion_service
 
 logger = logging.getLogger(__name__)
 
@@ -176,15 +177,140 @@ async def detect_emotion(request: EmotionDetectRequest):
 
     except HTTPException:
         raise
+     except Exception as e:
+         logger.error(f"[Emotion] Unexpected error: {e}")
+         logger.error(f"[Emotion] Traceback: {traceback.format_exc()}")
+         try:
+             db = get_db()
+             await db.sessions.update_one(
+                 {"_id": request.session_id},
+                 {"$set": {"emotion": "Neutral", "rasa": "Shaant"}},
+             )
+         except Exception as db_err:
+             logger.error(f"[Emotion] Failed to persist fallback emotion: {db_err}")
+         return _fallback_response()
+
+
+# ============================================================================
+# NEW CLEAN EMOTION DETECTION SERVICE - INTEGRATED ENDPOINTS
+# ============================================================================
+
+
+class CleanEmotionResponse(BaseModel):
+    """Response model for clean emotion detection"""
+    success: bool
+    emotion: str
+    confidence: float
+    emotions: dict
+    is_brave: bool
+    face_detected: bool
+    error: str = None
+
+
+@router.post("/emotion/detect-clean")
+async def detect_emotion_clean(image_base64: str = Form(...)) -> CleanEmotionResponse:
+    """
+    Clean emotion detection from base64 image.
+    Uses refactored HSEmotion service with 8 emotions.
+    
+    Args:
+        image_base64: Base64-encoded image string
+        
+    Returns:
+        CleanEmotionResponse with detailed emotion breakdown
+    """
+    try:
+        if not image_base64:
+            raise ValueError("Image data is required")
+        
+        # Get clean emotion service
+        service = get_clean_emotion_service()
+        result = service.detect_from_base64(image_base64)
+        
+        return CleanEmotionResponse(**result)
+    
+    except ValueError as e:
+        logger.warning(f"[CleanEmotion] Validation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"[Emotion] Unexpected error: {e}")
-        logger.error(f"[Emotion] Traceback: {traceback.format_exc()}")
-        try:
-            db = get_db()
-            await db.sessions.update_one(
-                {"_id": request.session_id},
-                {"$set": {"emotion": "Neutral", "rasa": "Shaant"}},
-            )
-        except Exception as db_err:
-            logger.error(f"[Emotion] Failed to persist fallback emotion: {db_err}")
-        return _fallback_response()
+        logger.error(f"[CleanEmotion] Error detecting emotion: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post("/emotion/detect-file-clean")
+async def detect_emotion_file_clean(file: UploadFile = File(...)) -> CleanEmotionResponse:
+    """
+    Clean emotion detection from uploaded image file.
+    
+    Args:
+        file: Uploaded image file (JPEG, PNG, BMP)
+        
+    Returns:
+        CleanEmotionResponse with detailed emotion breakdown
+    """
+    try:
+        if not file:
+            raise ValueError("Image file is required")
+        
+        # Validate file type
+        allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/bmp"]
+        if file.content_type not in allowed_types:
+            raise ValueError(f"Invalid file type. Allowed: {', '.join(allowed_types)}")
+        
+        # Read file
+        file_bytes = await file.read()
+        
+        # Get clean emotion service
+        service = get_clean_emotion_service()
+        result = service.detect_from_file(file_bytes)
+        
+        return CleanEmotionResponse(**result)
+    
+    except ValueError as e:
+        logger.warning(f"[CleanEmotion] Validation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"[CleanEmotion] Error detecting emotion: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/emotion/health-clean")
+async def emotion_health_clean():
+    """Health check for clean emotion detection service"""
+    try:
+        service = get_clean_emotion_service()
+        is_healthy = service.model is not None
+        
+        return {
+            "status": "healthy" if is_healthy else "degraded",
+            "service": "clean_emotion_detection",
+            "model": "HSEmotion (enet_b0_8_best_afew)",
+            "device": "CPU",
+            "emotions": ["happy", "neutral", "sad", "angry", "bravery"],
+        }
+    except Exception as e:
+        logger.error(f"[CleanEmotion] Health check failed: {e}")
+        return {
+            "status": "error",
+            "service": "clean_emotion_detection",
+            "error": str(e),
+        }
+
+
+@router.get("/emotion/info-clean")
+async def emotion_info_clean():
+    """Information about clean emotion detection service"""
+    return {
+        "name": "Clean Emotion Detection Service",
+        "version": "1.0.0",
+        "model": "HSEmotion (enet_b0_8_best_afew)",
+        "raw_emotions": ["Anger", "Contempt", "Disgust", "Fear", "Happiness", "Neutral", "Sadness", "Surprise"],
+        "simplified_emotions": ["happy", "neutral", "sad", "angry", "bravery"],
+        "endpoints": {
+            "POST /api/emotion/detect-clean": "Detect emotion from base64 image",
+            "POST /api/emotion/detect-file-clean": "Detect emotion from file upload",
+            "GET /api/emotion/health-clean": "Health check",
+            "GET /api/emotion/info-clean": "Service information",
+        },
+        "bravery_formula": "0.6 × happiness + 0.4 × neutral - 0.7 × fear",
+    }
