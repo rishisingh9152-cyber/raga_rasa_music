@@ -31,7 +31,9 @@ from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
 from app.config import settings
 from app.services.emotion_recognition_local import get_local_emotion_detector
-from app.services.clean_emotion_service import get_clean_emotion_service
+
+# Note: clean_emotion_service is imported lazily (only when endpoint is called)
+# to avoid importing cv2/torch at startup time on servers without GPU/OpenGL
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +41,13 @@ router = APIRouter()
 
 # Lazy-load detector only when first request arrives.
 _emotion_detector = None
+
+
+def get_clean_emotion_service_lazy():
+    """Import clean emotion service only when clean endpoints are called."""
+    from app.services.clean_emotion_service import get_clean_emotion_service
+
+    return get_clean_emotion_service()
 
 
 class EmotionDetectRequest(BaseModel):
@@ -256,7 +265,7 @@ async def detect_emotion_clean(image_base64: str = Form(...)) -> CleanEmotionRes
             raise ValueError("Image data is required")
         
         # Get clean emotion service
-        service = get_clean_emotion_service()
+        service = get_clean_emotion_service_lazy()
         result = service.detect_from_base64(image_base64)
         
         return CleanEmotionResponse(**result)
@@ -293,7 +302,7 @@ async def detect_emotion_file_clean(file: UploadFile = File(...)) -> CleanEmotio
         file_bytes = await file.read()
         
         # Get clean emotion service
-        service = get_clean_emotion_service()
+        service = get_clean_emotion_service_lazy()
         result = service.detect_from_file(file_bytes)
         
         return CleanEmotionResponse(**result)
@@ -310,7 +319,7 @@ async def detect_emotion_file_clean(file: UploadFile = File(...)) -> CleanEmotio
 async def emotion_health_clean():
     """Health check for clean emotion detection service"""
     try:
-        service = get_clean_emotion_service()
+        service = get_clean_emotion_service_lazy()
         is_healthy = service.model is not None
         
         return {
