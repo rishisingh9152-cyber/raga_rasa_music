@@ -11,7 +11,7 @@ from app.services.rasa_model import get_rasa_model
 from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
 from app.config import settings
-from archived_emotion_service.api import detect_emotion_from_base64
+from app.services.emotion_recognition_local import get_local_emotion_detector
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +52,9 @@ def get_emotion_detector_lazy():
 
 
 async def detect_with_integrated_archived_module(image_base64: str):
-    """Use archived_emotion_service as in-process backend module (no separate server)."""
-    emotion_raw, confidence, _ = await asyncio.to_thread(detect_emotion_from_base64, image_base64)
+    """Use in-process local emotion_recognition module (no separate server)."""
+    detector = get_local_emotion_detector()
+    emotion_raw, confidence, _ = await asyncio.to_thread(detector.detect_from_base64, image_base64)
     emotion_map = {
         "happy": "Happy",
         "neutral": "Neutral",
