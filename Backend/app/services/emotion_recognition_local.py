@@ -5,10 +5,6 @@ import ssl
 import warnings
 from typing import Any, Dict, Optional, Tuple
 
-import cv2
-import numpy as np
-from hsemotion.facial_emotions import HSEmotionRecognizer
-
 ssl._create_default_https_context = ssl._create_unverified_context
 warnings.filterwarnings("ignore")
 
@@ -28,23 +24,38 @@ HS_CLASSES = [
 class EmotionRecognitionLocal:
     def __init__(self):
         self._initialized = False
+        self._deps_available = False
+        self._cv2 = None
+        self._np = None
         self.recognizer = None
-        self.face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-        )
-        self.face_cascade_alt = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
-        )
+        self.face_cascade = None
+        self.face_cascade_alt = None
 
     def _ensure_model(self) -> bool:
         if self._initialized:
-            return self.recognizer is not None
+            return self._deps_available and self.recognizer is not None
         self._initialized = True
         try:
+            import cv2
+            import numpy as np
+            from hsemotion.facial_emotions import HSEmotionRecognizer
+
+            self._cv2 = cv2
+            self._np = np
             self.recognizer = HSEmotionRecognizer(model_name="enet_b0_8_best_afew", device="cpu")
+            self.face_cascade = cv2.CascadeClassifier(
+                cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+            )
+            self.face_cascade_alt = cv2.CascadeClassifier(
+                cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
+            )
+            self._deps_available = True
             return True
         except Exception:
             self.recognizer = None
+            self.face_cascade = None
+            self.face_cascade_alt = None
+            self._deps_available = False
             return False
 
     def detect_from_base64(self, image_base64: str) -> Tuple[str, float, Dict[str, Any]]:
@@ -52,8 +63,10 @@ class EmotionRecognitionLocal:
             image_base64 = image_base64.split(",", 1)[1]
 
         image_bytes = base64.b64decode(image_base64)
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if not self._ensure_model():
+            return "neutral", 0.5, {"raw_dominant": "neutral", "emotions": {"neutral": 50.0}}
+        nparr = self._np.frombuffer(image_bytes, self._np.uint8)
+        frame = self._cv2.imdecode(nparr, self._cv2.IMREAD_COLOR)
         if frame is None:
             return "neutral", 0.5, {"raw_dominant": "neutral", "emotions": {"neutral": 50.0}}
 
@@ -65,7 +78,7 @@ class EmotionRecognitionLocal:
             confidence = confidence / 100.0
         return str(dominant_raw), confidence, result
 
-    def detect_from_frame(self, frame: np.ndarray) -> Dict[str, Any]:
+    def detect_from_frame(self, frame) -> Dict[str, Any]:
         empty = {
             "emotions": {"happy": 0.0, "neutral": 0.0, "sad": 0.0, "angry": 0.0, "bravery": 0.0},
             "dominant": "No Face Detected",
@@ -129,16 +142,16 @@ class EmotionRecognitionLocal:
             "face_box": (x1, y1, x2 - x1, y2 - y1),
         }
 
-    def _detect_face(self, frame: np.ndarray) -> Optional[Tuple[int, int, int, int]]:
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray = cv2.equalizeHist(gray)
+    def _detect_face(self, frame) -> Optional[Tuple[int, int, int, int]]:
+        gray = self._cv2.cvtColor(frame, self._cv2.COLOR_BGR2GRAY)
+        gray = self._cv2.equalizeHist(gray)
         for cascade in [self.face_cascade, self.face_cascade_alt]:
             faces = cascade.detectMultiScale(
                 gray,
                 scaleFactor=1.05,
                 minNeighbors=4,
                 minSize=(50, 50),
-                flags=cv2.CASCADE_SCALE_IMAGE,
+                flags=self._cv2.CASCADE_SCALE_IMAGE,
             )
             if len(faces) > 0:
                 return tuple(max(faces, key=lambda f: f[2] * f[3]))
