@@ -1,10 +1,15 @@
 # Use Python 3.10.13 slim image
 FROM python:3.10.13-slim
 
+# Build timestamp - change this to force rebuild
+# Build: 2026-04-13T07:25:00Z
+
 # Set working directory
 WORKDIR /app
 
 # Install minimal system dependencies required for ML libraries
+# CRITICAL: libgl1-mesa-glx is REQUIRED for OpenCV (cv2) to work
+# These libraries are needed for emotion detection and image processing
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -14,7 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 \
     libxrender-dev \
     libgomp1 \
+    libgl1 \
     libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
