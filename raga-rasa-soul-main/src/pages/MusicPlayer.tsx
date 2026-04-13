@@ -44,7 +44,8 @@ const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Helper function to get song ID (handle both _id and song_id)
-  const getSongId = (song: Song): string => {
+  const getSongId = (song: Song | null | undefined): string => {
+    if (!song) return "";
     return song._id || song.song_id || "";
   };
 
@@ -93,7 +94,12 @@ const MusicPlayer = () => {
         if (sessionData) {
           const session = JSON.parse(sessionData);
           if (session.recommended_songs) {
-            const ids = new Set(session.recommended_songs.map((s: any) => getSongId(s)));
+            const ids = new Set(
+              session.recommended_songs
+                .filter(Boolean)
+                .map((s: any) => getSongId(s))
+                .filter(Boolean)
+            );
             setRecommendedSongIds(ids);
           }
         }
