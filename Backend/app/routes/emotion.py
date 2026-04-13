@@ -20,6 +20,14 @@ router = APIRouter()
 # Lazy-load emotion detector (only import when needed, not on startup)
 _emotion_detector = None
 
+
+def _get_fallback_emotion_response() -> EmotionDetectSchema:
+    return EmotionDetectSchema(
+        emotion="Neutral",
+        confidence=0.5,
+        raw_dominant="neutral"
+    )
+
 def get_emotion_detector_lazy():
     """Lazy-load emotion detector on first use"""
     global _emotion_detector
@@ -42,15 +50,24 @@ class EmotionDetectRequest(BaseModel):
 
 @router.get("/emotion-service/health")
 async def emotion_service_health():
-    """Check if emotion recognition service is available"""
+    """Check internal emotion detector status (archived external service is unused)."""
     try:
         detector = get_emotion_detector_lazy()
+        if detector is None:
+            return {
+                "status": "degraded",
+                "service": "internal_emotion_recognition",
+                "mode": "fallback_neutral",
+                "external_service_used": False,
+            }
+
         is_healthy = detector.recognizer is not None or detector.detector is not None
         return {
             "status": "healthy" if is_healthy else "unavailable",
             "service": "internal_emotion_recognition",
             "model_type": detector.model_type,
-            "fallback_available": True
+            "fallback_available": True,
+            "external_service_used": False,
         }
     except Exception as e:
         logger.error(f"[Emotion] Health check failed: {e}")
@@ -155,11 +172,11 @@ async def detect_emotion(request: EmotionDetectRequest):
             f"emotion={emotion} (conf: {confidence:.2f}), "
             f"rasa={rasa} (conf: {rasa_result.get('confidence', 0.8):.2f})"
         )
-        return EmotionDetectSchema(
-            emotion=emotion,
-            confidence=confidence,
-            raw_dominant=emotion.lower()
-        )
+            return EmotionDetectSchema(
+                emotion=emotion,
+                confidence=confidence,
+                raw_dominant=emotion.lower()
+            )
         
     except HTTPException:
         # Re-raise HTTP exceptions
@@ -175,11 +192,7 @@ async def detect_emotion(request: EmotionDetectRequest):
                 {"_id": request.session_id},
                 {"$set": {"emotion": "Neutral", "rasa": "Shaant"}}
             )
-            return EmotionDetectSchema(
-                emotion="Neutral",
-                confidence=0.5,
-                raw_dominant="neutral"
-            )
+            return _get_fallback_emotion_response()
         except Exception as db_err:
             logger.error(f"[Emotion] Failed to update fallback emotion: {db_err}")
-            raise HTTPException(status_code=500, detail="Emotion detection failed")
+            return _get_fallback_emotion_response()
