@@ -22,6 +22,7 @@ scipy==1.11.4
 librosa==0.10.0
 
 # Emotion Detection
+hsemotion>=0.1.0
 fer==25.10.3
 deepface==0.0.67
 
