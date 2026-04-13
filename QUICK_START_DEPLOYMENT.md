@@ -2,8 +2,37 @@
 
 ## TL;DR - Deploy in 90 Minutes
 
-### Step 1: Backend Deployment (45 min) → Google Cloud Run
+### Step 1: Backend Deployment
 
+Choose ONE of these three options:
+
+#### Option A: Render (Easiest - 30 min) ⭐ RECOMMENDED
+```bash
+# 1. Push to GitHub
+git push origin main
+
+# 2. Go to https://render.com/dashboard
+# 3. Click "New +" → "Web Service"
+# 4. Connect GitHub repo: raga_rasa_music
+# 5. Fill in:
+#    - Name: raga-rasa-backend
+#    - Root Directory: Backend
+#    - Build Command: pip install --upgrade pip && pip install -r requirements.txt
+#    - Start Command: gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT main:app
+
+# 6. Add Environment Variables:
+#    - MONGODB_URL: [your_mongodb_url]
+#    - JWT_SECRET: [generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"]
+#    - CORS_ORIGINS: https://raga-rasa-soul.vercel.app
+
+# 7. Click "Create Web Service"
+# 8. Wait for deployment (2-5 min)
+```
+
+**Result**: `https://raga-rasa-backend.onrender.com`
+**Cost**: $7/month (Starter tier) or Free (with limitations)
+
+#### Option B: Google Cloud Run (30 min)
 ```bash
 # 1. Create GCP project
 gcloud projects create raga-rasa-soul-prod
@@ -26,6 +55,18 @@ gcloud run services describe raga-rasa-backend --region=us-central1 --format='va
 ```
 
 **Result**: `https://raga-rasa-backend-xxxxx.run.app`
+**Cost**: Pay-as-you-go ($0-50/month)
+
+#### Option C: Heroku (if you have credits)
+```bash
+# 1. heroku create raga-rasa-backend
+# 2. heroku buildpacks:set heroku/python
+# 3. heroku config:set MONGODB_URL=your_url JWT_SECRET=your_secret
+# 4. git push heroku main
+```
+
+**Result**: `https://raga-rasa-backend.herokuapp.com`
+**Cost**: $7/month minimum
 
 ### Step 2: Frontend Deployment (15 min) → Vercel
 
@@ -73,9 +114,10 @@ python test_e2e_production.py
 
 For complete step-by-step instructions:
 
-1. **Backend**: See `GOOGLE_CLOUD_RUN_DEPLOYMENT.md` (45 min)
-2. **Frontend**: See `VERCEL_FRONTEND_DEPLOYMENT.md` (15 min)
-3. **Emotion Service**: See `HF_SPACES_EMOTION_DEPLOYMENT.md` (10 min)
+1. **Render (Recommended)**: See `RENDER_BACKEND_DEPLOYMENT.md` (30 min)
+2. **Google Cloud Run**: See `GOOGLE_CLOUD_RUN_DEPLOYMENT.md` (45 min)
+3. **Frontend**: See `VERCEL_FRONTEND_DEPLOYMENT.md` (15 min)
+4. **Emotion Service**: See `HF_SPACES_EMOTION_DEPLOYMENT.md` (10 min)
 
 ---
 
@@ -119,13 +161,32 @@ python Backend/test_integration_suite.py
 
 ## Cost Summary
 
+### Option 1: Render (Recommended)
 | Service | Free Tier | Monthly Cost |
 |---------|-----------|--------------|
-| Google Cloud Run | Yes | $0-50 |
+| Render Backend | No* | $7+ |
 | MongoDB Atlas | Yes (M0) | $0 |
-| Vercel | Yes | $0 |
-| HF Spaces | Yes (CPU) | $0-4.50 |
+| Vercel Frontend | Yes | $0 |
+| HF Spaces Emotion | Yes (CPU) | $0-4.50 |
+| **Total** | | **$7-12/month** |
+
+*Free tier available with limitations (auto-suspends after 15 min of inactivity)
+
+### Option 2: Google Cloud Run
+| Service | Free Tier | Monthly Cost |
+|---------|-----------|--------------|
+| Google Cloud Run | Yes* | $0-50 |
+| MongoDB Atlas | Yes (M0) | $0 |
+| Vercel Frontend | Yes | $0 |
+| HF Spaces Emotion | Yes (CPU) | $0-4.50 |
 | **Total** | | **$0-55/month** |
+
+*Free tier: 2M requests/month, 360K vCPU-seconds/month
+
+### Recommendation
+- **Cheapest**: Google Cloud Run (~$0-20/month)
+- **Easiest**: Render (~$7/month)
+- **Best Balance**: Render Starter tier
 
 ---
 
