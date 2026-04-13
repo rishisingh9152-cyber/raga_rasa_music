@@ -10,10 +10,8 @@ os.environ['LIBGL_ALWAYS_INDIRECT'] = '1'
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 os.environ['OPENCV_VIDEOIO_DEBUG'] = '0'
 
-# Now safe to import cv2
-import cv2
-cv2.setUseOptimized(False)
-cv2.setNumThreads(0)
+# DO NOT import cv2 at module level - this causes libGL.so.1 errors in headless containers
+# cv2 will be imported lazily inside functions when actually needed
 
 import numpy as np
 import base64
@@ -87,6 +85,12 @@ class EmotionDetector:
     
     def __init__(self):
         """Initialize emotion detection model"""
+        # Lazy-load cv2 only when detector is actually instantiated
+        import cv2
+        cv2.setUseOptimized(False)
+        cv2.setNumThreads(0)
+        self.cv2 = cv2
+        
         self.model_type = getattr(settings, 'EMOTION_MODEL', 'hsemotion')
         self.recognizer = None
         self.face_cascade = None
@@ -107,11 +111,11 @@ class EmotionDetector:
                 )
                 
                 # Load face cascades
-                self.face_cascade = cv2.CascadeClassifier(
-                    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+                self.face_cascade = self.cv2.CascadeClassifier(
+                    self.cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
                 )
-                self.face_cascade_alt = cv2.CascadeClassifier(
-                    cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
+                self.face_cascade_alt = self.cv2.CascadeClassifier(
+                    self.cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
                 )
                 
                 self.model_type = 'hsemotion'
@@ -188,7 +192,7 @@ class EmotionDetector:
             # Decode base64
             image_data = base64.b64decode(image_base64)
             image_array = np.frombuffer(image_data, dtype=np.uint8)
-            image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            image = self.cv2.imdecode(image_array, self.cv2.IMREAD_COLOR)
             
             if image is None:
                 raise ValueError("Failed to decode image")
@@ -341,8 +345,8 @@ class EmotionDetector:
     def _detect_face(self, frame):
         """Detect face in frame using cascades"""
         try:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            gray = cv2.equalizeHist(gray)
+            gray = self.cv2.cvtColor(frame, self.cv2.COLOR_BGR2GRAY)
+            gray = self.cv2.equalizeHist(gray)
             
             for cascade in [self.face_cascade, self.face_cascade_alt]:
                 if cascade is not None and not cascade.empty():
@@ -351,7 +355,7 @@ class EmotionDetector:
                         scaleFactor=1.05,
                         minNeighbors=4,
                         minSize=(50, 50),
-                        flags=cv2.CASCADE_SCALE_IMAGE
+                        flags=self.cv2.CASCADE_SCALE_IMAGE
                     )
                     if len(faces) > 0:
                         # Return largest face

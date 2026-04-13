@@ -6,7 +6,8 @@ import logging
 import traceback
 
 from app.database import get_db
-from app.services.emotion import get_emotion_detector
+# DO NOT import emotion detector at module level - make it lazy-loaded
+# This prevents cv2 import errors on startup
 from app.services.rasa_model import get_rasa_model
 from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
@@ -15,6 +16,21 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# Lazy-load emotion detector (only import when needed, not on startup)
+_emotion_detector = None
+
+def get_emotion_detector_lazy():
+    """Lazy-load emotion detector on first use"""
+    global _emotion_detector
+    if _emotion_detector is None:
+        try:
+            from app.services.emotion import get_emotion_detector
+            _emotion_detector = get_emotion_detector()
+        except ImportError as e:
+            logger.error(f"[Emotion] Failed to load emotion detector: {e}")
+            raise HTTPException(status_code=503, detail="Emotion detection service unavailable")
+    return _emotion_detector
 
 
 class EmotionDetectRequest(BaseModel):
@@ -27,7 +43,7 @@ class EmotionDetectRequest(BaseModel):
 async def emotion_service_health():
     """Check if emotion recognition service is available"""
     try:
-        detector = get_emotion_detector()
+        detector = get_emotion_detector_lazy()
         is_healthy = detector.recognizer is not None or detector.detector is not None
         return {
             "status": "healthy" if is_healthy else "unavailable",
@@ -78,8 +94,8 @@ async def detect_emotion(request: EmotionDetectRequest):
         
         logger.info(f"[Emotion] Attempting emotion detection for session: {request.session_id}")
         
-        # Get emotion detector instance
-        detector = get_emotion_detector()
+        # Get emotion detector instance (lazy-loaded)
+        detector = get_emotion_detector_lazy()
         
         # Detect emotion from base64 image
         try:
