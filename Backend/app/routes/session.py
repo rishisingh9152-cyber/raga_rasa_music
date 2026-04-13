@@ -194,7 +194,7 @@ async def update_session_emotion(session_id: str, emotion: str, rasa: str, confi
         if not session:
             raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
         
-        if session.get("user_id") != current_user.get("user_id"):
+        if current_user.get("user_id") and session.get("user_id") != current_user.get("user_id"):
             raise HTTPException(status_code=403, detail="Not authorized to modify this session")
         
         result = await db.sessions.update_one(
@@ -250,7 +250,7 @@ async def add_song_to_session(session_id: str, song_id: str, song_type: str = "p
         if not session:
             raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
         
-        if session.get("user_id") != current_user.get("user_id"):
+        if current_user.get("user_id") and session.get("user_id") != current_user.get("user_id"):
             raise HTTPException(status_code=403, detail="Not authorized to modify this session")
         
         field = "played_songs" if song_type == "played" else "recommended_songs"
@@ -360,7 +360,7 @@ async def get_session_summary(session_id: str, current_user: Dict[str, Any] = De
             raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
         
         # Verify user owns this session
-        if session.get("user_id") != current_user.get("user_id"):
+        if current_user.get("user_id") and session.get("user_id") != current_user.get("user_id"):
             raise HTTPException(status_code=403, detail="Not authorized to access this session")
         
         # Get additional statistics - filter by both session_id AND user_id

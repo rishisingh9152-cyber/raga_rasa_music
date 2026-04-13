@@ -85,8 +85,8 @@ class Settings(BaseSettings):
         
         return list(set(origins))  # Remove duplicates
     
-    # Storage Configuration - Use Cloudinary for production
-    STORAGE_PROVIDER: str = "cloudinary"
+    # Storage Configuration
+    STORAGE_PROVIDER: str = os.getenv("STORAGE_PROVIDER", "local")
     STORAGE_BASE_PATH: str = os.getenv("STORAGE_BASE_PATH", "/tmp/Songs")
     
     # Cloudinary Configuration - Use environment variables (optional storage)

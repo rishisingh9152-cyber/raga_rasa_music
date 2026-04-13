@@ -521,18 +521,22 @@ class StorageFactory:
         if cls._provider_instance is None:
             provider_type = settings.STORAGE_PROVIDER.lower()
             
-            if provider_type == "local":
-                cls._provider_instance = LocalStorageProvider()
-            elif provider_type == "cloudinary":
-                cls._provider_instance = CloudinaryStorageProvider()
-            elif provider_type == "google_drive":
-                cls._provider_instance = GoogleDriveStorageProvider()
-            elif provider_type == "aws_s3":
-                cls._provider_instance = AWS_S3_StorageProvider()
-            elif provider_type == "azure_blob":
-                cls._provider_instance = AzureBlobStorageProvider()
-            else:
-                logger.warning(f"Unknown storage provider: {provider_type}, defaulting to local")
+            try:
+                if provider_type == "local":
+                    cls._provider_instance = LocalStorageProvider()
+                elif provider_type == "cloudinary":
+                    cls._provider_instance = CloudinaryStorageProvider()
+                elif provider_type == "google_drive":
+                    cls._provider_instance = GoogleDriveStorageProvider()
+                elif provider_type == "aws_s3":
+                    cls._provider_instance = AWS_S3_StorageProvider()
+                elif provider_type == "azure_blob":
+                    cls._provider_instance = AzureBlobStorageProvider()
+                else:
+                    logger.warning(f"Unknown storage provider: {provider_type}, defaulting to local")
+                    cls._provider_instance = LocalStorageProvider()
+            except Exception as provider_err:
+                logger.error(f"Storage provider init failed ({provider_type}): {provider_err}. Falling back to local storage.")
                 cls._provider_instance = LocalStorageProvider()
         
         return cls._provider_instance

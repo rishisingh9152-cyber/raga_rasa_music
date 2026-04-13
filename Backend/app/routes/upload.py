@@ -150,11 +150,13 @@ async def confirm_upload(
         if rasa not in valid_rasas:
             raise HTTPException(status_code=400, detail=f"Invalid rasa. Must be one of {valid_rasas}")
         
-        # Determine if we should use cloud storage
+        # Step 1: Move file to storage (prefer configured provider, fallback to local)
         use_cloud = settings.STORAGE_PROVIDER != "local"
-        
-        # Step 1: Move file to storage (cloud or local)
-        move_result = await move_song_to_rasa_folder(temp_path, rasa, title, use_cloud=use_cloud)
+        try:
+            move_result = await move_song_to_rasa_folder(temp_path, rasa, title, use_cloud=use_cloud)
+        except Exception as storage_err:
+            logger.warning(f"Configured storage failed, retrying local storage: {storage_err}")
+            move_result = await move_song_to_rasa_folder(temp_path, rasa, title, use_cloud=False)
         logger.info(f"Confirmed song upload to {move_result.get('storage_type', 'local')}: {move_result.get('final_path')}")
         
         # Step 2: Store in database with metadata

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useSession } from "@/context/SessionContext";
-import { rateSong } from "@/services/api";
+import { rateSong, recommendFinal } from "@/services/api";
 import { getUserId } from "@/utils/userIdentity";
 import { Star, MessageSquare } from "lucide-react";
 
@@ -35,6 +35,16 @@ const Feedback = () => {
         session_rating: rating,
         comment: comment
       };
+
+      if (session.detected_emotion && session.session_id && session.cognitive_data) {
+        // Persist session-level feedback and final recommendations server-side
+        await recommendFinal(
+          session.detected_emotion,
+          session.session_id,
+          session.cognitive_data,
+          feedback
+        );
+      }
 
       const ratingPromises = Object.entries(songRatings)
         .filter(([songId]) => !!songId)

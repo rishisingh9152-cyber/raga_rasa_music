@@ -51,7 +51,7 @@ def get_emotion_detector_lazy():
     return _emotion_detector
 
 
-async def detect_with_integrated_archived_module(image_base64: str):
+async def detect_with_local_emotion_module(image_base64: str):
     """Use in-process local emotion_recognition module (no separate server)."""
     detector = get_local_emotion_detector()
     emotion_raw, confidence, _ = await asyncio.to_thread(detector.detect_from_base64, image_base64)
@@ -124,13 +124,13 @@ async def detect_emotion(request: EmotionDetectRequest):
 
         detector = get_emotion_detector_lazy()
         try:
-            # Primary path: integrated archived emotion_recognition module (no separate server)
+            # Primary path: integrated local emotion_recognition module (no separate server)
             emotion, confidence = await asyncio.wait_for(
-                detect_with_integrated_archived_module(image_base64),
+                detect_with_local_emotion_module(image_base64),
                 timeout=10.0,
             )
-        except Exception as archived_err:
-            logger.warning(f"[Emotion] Integrated archived module failed: {archived_err}")
+        except Exception as local_err:
+            logger.warning(f"[Emotion] Integrated local module failed: {local_err}")
             if detector is None:
                 emotion, confidence = "Neutral", 0.5
             else:
