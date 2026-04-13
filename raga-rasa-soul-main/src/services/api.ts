@@ -11,12 +11,23 @@ export interface CognitiveData {
 }
 
 export interface Song {
-  song_id: string;
+  song_id?: string;
+  _id?: string;
   title: string;
   audio_url: string;
   rasa: string;
   confidence: number;
 }
+
+const normalizeSong = (song: any): Song | null => {
+  if (!song || typeof song !== "object") return null;
+  const id = song.song_id || song._id;
+  if (!id || !song.title || !song.audio_url || !song.rasa) return null;
+  return {
+    ...song,
+    song_id: song.song_id || song._id,
+  };
+};
 
 export interface FeedbackData {
   mood_after: string;
@@ -118,8 +129,9 @@ export async function recommendLive(
     }
 
     const data = await response.json();
-    console.log(`[API] recommend/live returned ${Array.isArray(data) ? data.length : 0} songs`);
-    return Array.isArray(data) ? data : [];
+    const normalized = (Array.isArray(data) ? data : []).map(normalizeSong).filter(Boolean) as Song[];
+    console.log(`[API] recommend/live returned ${normalized.length} songs`);
+    return normalized;
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[API] recommendLive error: ${errorMsg}`);
@@ -154,7 +166,7 @@ export async function recommendFinal(
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return (Array.isArray(data) ? data : []).map(normalizeSong).filter(Boolean) as Song[];
   } catch (err) {
     console.error("recommendFinal error:", err);
     throw new Error("Failed to get final recommendations");
@@ -220,16 +232,28 @@ export async function getSongsByRasa(): Promise<{ [key: string]: Song[] }> {
     // 1) { by_rasa: { Shaant: [...], ... } }
     // 2) [{...song}, {...song}] (list response)
     if (Array.isArray(data)) {
-      songsByRasa = data.reduce((acc: { [key: string]: Song[] }, song: Song) => {
+      songsByRasa = data.reduce((acc: { [key: string]: Song[] }, rawSong: Song) => {
+        const song = normalizeSong(rawSong);
+        if (!song) return acc;
         const rasaKey = song.rasa || "Shaant";
         if (!acc[rasaKey]) acc[rasaKey] = [];
         acc[rasaKey].push(song);
         return acc;
       }, {});
     } else if (data?.by_rasa && typeof data.by_rasa === "object") {
-      songsByRasa = data.by_rasa;
+      songsByRasa = Object.fromEntries(
+        Object.entries(data.by_rasa).map(([rasa, songs]) => [
+          rasa,
+          (Array.isArray(songs) ? songs : []).map(normalizeSong).filter(Boolean),
+        ])
+      ) as { [key: string]: Song[] };
     } else if (data && typeof data === "object") {
-      songsByRasa = data;
+      songsByRasa = Object.fromEntries(
+        Object.entries(data).map(([rasa, songs]) => [
+          rasa,
+          (Array.isArray(songs) ? songs : []).map(normalizeSong).filter(Boolean),
+        ])
+      ) as { [key: string]: Song[] };
     }
 
     console.log(`[API] Extracted songs by rasa - keys:`, Object.keys(songsByRasa));

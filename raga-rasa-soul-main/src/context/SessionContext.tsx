@@ -11,7 +11,8 @@ export interface CognitiveData {
 }
 
 export interface Song {
-  song_id: string;
+  song_id?: string;
+  _id?: string;
   title: string;
   audio_url: string;
   rasa: string;

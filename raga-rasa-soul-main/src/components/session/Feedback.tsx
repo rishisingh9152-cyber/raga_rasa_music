@@ -16,6 +16,11 @@ const Feedback = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  const getSongId = (song: any): string => {
+    if (!song) return "";
+    return song.song_id || song._id || "";
+  };
+
   const handleSubmit = async () => {
     if (rating === 0) return;
 
@@ -31,9 +36,11 @@ const Feedback = () => {
         comment: comment
       };
 
-      const ratingPromises = Object.entries(songRatings).map(([songId, songRating]) =>
-        rateSong(userId, songId, songRating as number, session.session_id!, feedback)
-      );
+      const ratingPromises = Object.entries(songRatings)
+        .filter(([songId]) => !!songId)
+        .map(([songId, songRating]) =>
+          rateSong(userId, songId, songRating as number, session.session_id!, feedback)
+        );
 
       await Promise.all(ratingPromises);
 
@@ -96,9 +103,9 @@ const Feedback = () => {
           >
             <h3 className="font-display font-semibold text-foreground">Rate the songs:</h3>
             <div className="space-y-3 max-h-48 overflow-y-auto">
-              {session.recommended_songs.map(song => (
+              {session.recommended_songs.filter(Boolean).map(song => (
                 <div
-                  key={song.song_id}
+                  key={getSongId(song)}
                   className="flex items-center justify-between gap-3 p-3 rounded-lg bg-muted/20"
                 >
                   <div className="flex-1">
@@ -110,13 +117,13 @@ const Feedback = () => {
                       <button
                         key={star}
                         onClick={() =>
-                          setSongRatings(prev => ({
-                            ...prev,
-                            [song.song_id]: star
-                          }))
-                        }
+                            setSongRatings(prev => ({
+                              ...prev,
+                              [getSongId(song)]: star
+                            }))
+                          }
                         className={`w-6 h-6 rounded text-xs font-bold transition-colors ${
-                          star <= (songRatings[song.song_id] || 0)
+                          star <= (songRatings[getSongId(song)] || 0)
                             ? "bg-warning text-white"
                             : "bg-muted text-muted-foreground hover:bg-muted/80"
                         }`}
