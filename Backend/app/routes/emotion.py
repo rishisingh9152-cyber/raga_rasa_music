@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import logging
 import traceback
+import asyncio
 
 from app.database import get_db
 from app.services.rasa_model import get_rasa_model
@@ -106,7 +107,10 @@ async def detect_emotion(request: EmotionDetectRequest):
             confidence = 0.5
         else:
             try:
-                emotion, confidence = await detector.detect_from_base64(image_base64)
+                emotion, confidence = await asyncio.wait_for(
+                    detector.detect_from_base64(image_base64),
+                    timeout=8.0,
+                )
                 threshold = getattr(settings, "EMOTION_CONFIDENCE_THRESHOLD", 0.3)
                 if confidence < threshold:
                     emotion = "Neutral"

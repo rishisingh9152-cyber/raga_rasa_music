@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 from pydantic import BaseModel
 import uuid
+import asyncio
 
 from app.database import get_db
 from app.models import SongSchema
@@ -83,7 +84,10 @@ async def upload_song(
         # Step 2: Classify using rasa model based on audio spectrogram
         try:
             rasa_model = get_rasa_model()
-            classification_result = rasa_model.predict_rasa_from_audio(temp_info['temp_path'])
+            classification_result = await asyncio.wait_for(
+                asyncio.to_thread(rasa_model.predict_rasa_from_audio, temp_info['temp_path']),
+                timeout=8.0,
+            )
             logger.info(f"Classified rasa from audio: {classification_result['rasa']} (confidence: {classification_result['confidence']:.4f})")
         except Exception as e:
             logger.warning(f"Rasa classification failed, using fallback: {e}")
