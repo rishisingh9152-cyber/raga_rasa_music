@@ -1,4 +1,23 @@
-"""Emotion detection endpoints integrated in backend (no external service)."""
+"""
+Emotion detection endpoints integrated in backend (no external service).
+
+MAIN FLOW (Used by Frontend):
+- Frontend calls: POST /api/detect (with session_id + base64 image)
+- This endpoint detects emotion and updates session database
+- Returns: { emotion: "Happy", confidence: 0.92, ... }
+
+ALTERNATIVE CLEAN SERVICE (NEW):
+- POST /api/emotion/detect-clean - Clean HSEmotion service (8 emotions + bravery)
+- POST /api/emotion/detect-file-clean - File upload version
+- GET /api/emotion/health-clean - Health check
+- GET /api/emotion/info-clean - Service information
+
+The frontend is connected to the main /api/detect endpoint which works with the
+existing emotion detection pipeline (emotion_recognition_local, emotion module, etc).
+
+The new clean emotion service (/api/emotion/detect-clean) is available as an
+alternative with detailed emotion breakdown but frontend is not using it yet.
+"""
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
@@ -110,7 +129,20 @@ async def emotion_service_health():
 @router.post("/detect-emotion", response_model=EmotionDetectSchema)
 @router.post("/detect", response_model=EmotionDetectSchema)
 async def detect_emotion(request: EmotionDetectRequest):
-    """Detect emotion from frontend base64 image via integrated backend model."""
+    """
+    Detect emotion from frontend base64 image via integrated backend model.
+    
+    This endpoint is called by the frontend (LiveSession.tsx) to detect emotion
+    from camera capture. It uses the existing emotion detection pipeline which includes:
+    - Local emotion_recognition module (primary)
+    - Internal detector module (fallback)
+    - Fallback to Neutral if all methods fail
+    
+    The emotion is then used to:
+    1. Get rasa (Indian classical music concept) from rasa_model
+    2. Cache the emotion for 5 minutes
+    3. Update the session in database with emotion, rasa, and confidence scores
+    """
 
     try:
         image_base64 = request.image_base64
@@ -173,10 +205,10 @@ async def detect_emotion(request: EmotionDetectRequest):
             },
         )
 
-        return EmotionDetectSchema(emotion=emotion, confidence=confidence, raw_dominant=emotion.lower())
+         return EmotionDetectSchema(emotion=emotion, confidence=confidence, raw_dominant=emotion.lower())
 
-    except HTTPException:
-        raise
+     except HTTPException:
+         raise
      except Exception as e:
          logger.error(f"[Emotion] Unexpected error: {e}")
          logger.error(f"[Emotion] Traceback: {traceback.format_exc()}")
