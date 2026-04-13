@@ -33,6 +33,10 @@ def _fallback_response() -> EmotionDetectSchema:
 def get_emotion_detector_lazy():
     """Initialize integrated detector from backend service module."""
 
+    if not getattr(settings, "USE_INTERNAL_EMOTION_MODEL", False):
+        logger.info("[Emotion] Internal model disabled in config, using fallback mode")
+        return None
+
     global _emotion_detector
     if _emotion_detector is None:
         try:

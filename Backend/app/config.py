@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     )
     EMOTION_SERVICE_ENDPOINT: str = "/detect"
     EMOTION_CONFIDENCE_THRESHOLD: float = 0.3
+    USE_INTERNAL_EMOTION_MODEL: bool = os.getenv("USE_INTERNAL_EMOTION_MODEL", "false").lower() == "true"
     
     # Rasa Classification Model
     RASA_MODEL_PATH: str = "./models/rasa_classification/"
