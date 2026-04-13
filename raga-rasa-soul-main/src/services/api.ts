@@ -70,7 +70,7 @@ export async function detectEmotion(
     console.log(`[API] Calling detect-emotion endpoint for session: ${session_id}`);
     console.log(`[API] Image base64 length: ${image_base64.length}`);
     
-    const response = await fetch(`${API_BASE_URL}/detect-emotion`, {
+    const response = await fetch(`${API_BASE_URL}/detect`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
