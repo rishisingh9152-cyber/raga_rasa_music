@@ -207,20 +207,20 @@ async def detect_emotion(request: EmotionDetectRequest):
 
         return EmotionDetectSchema(emotion=emotion, confidence=confidence, raw_dominant=emotion.lower())
 
-     except HTTPException:
-         raise
-     except Exception as e:
-         logger.error(f"[Emotion] Unexpected error: {e}")
-         logger.error(f"[Emotion] Traceback: {traceback.format_exc()}")
-         try:
-             db = get_db()
-             await db.sessions.update_one(
-                 {"_id": request.session_id},
-                 {"$set": {"emotion": "Neutral", "rasa": "Shaant"}},
-             )
-         except Exception as db_err:
-             logger.error(f"[Emotion] Failed to persist fallback emotion: {db_err}")
-         return _fallback_response()
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"[Emotion] Unexpected error: {e}")
+        logger.error(f"[Emotion] Traceback: {traceback.format_exc()}")
+        try:
+            db = get_db()
+            await db.sessions.update_one(
+                {"_id": request.session_id},
+                {"$set": {"emotion": "Neutral", "rasa": "Shaant"}},
+            )
+        except Exception as db_err:
+            logger.error(f"[Emotion] Failed to persist fallback emotion: {db_err}")
+        return _fallback_response()
 
 
 # ============================================================================
