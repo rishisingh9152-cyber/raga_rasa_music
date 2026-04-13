@@ -11,6 +11,7 @@ import logging
 from app.config import settings
 from app.database import init_db, close_db
 from app.routes import session, emotion, recommendation, rating, history, catalog, upload, psychometric, images, auth
+from app.routes.emotion import warmup_emotion_models
 from app.services.cache import init_redis
 from app.services.song_upload import initialize_directories
 from app.services.rate_limiting import limiter
@@ -50,6 +51,14 @@ async def lifespan(app: FastAPI):
         logger.info("✓ Redis cache initialized")
     except Exception as e:
         logger.warning(f"⚠ Redis initialization failed (optional): {e}")
+
+    try:
+        logger.info("Step 4: Warming up emotion models...")
+        warmup = warmup_emotion_models()
+        logger.info(f"✓ Emotion warmup complete: {warmup}")
+    except Exception as e:
+        logger.error(f"✗ Emotion warmup failed: {e}")
+        logger.warning("⚠ Continuing with fallback emotion mode")
     
     logger.info("=" * 60)
     logger.info("✓ BACKEND STARTUP COMPLETE")
@@ -75,17 +84,13 @@ app = FastAPI(
 # Add rate limiter state to app
 app.state.limiter = limiter
 
-# CORS Configuration - Allow frontend requests with wildcard support for Vercel
-# Pattern: https://*.vercel.app allows all Vercel preview and production deployments
+# CORS Configuration - explicit production frontend allowlist
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
-    allow_origin_regex=settings.ALLOWED_ORIGINS_REGEX,
+    allow_origins=["https://raga-rasa-music-52.vercel.app"],
     allow_credentials=True,
-    allow_methods=settings.ALLOWED_METHODS,
-    allow_headers=settings.ALLOWED_HEADERS,
-    expose_headers=["*"],
-    max_age=3600,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

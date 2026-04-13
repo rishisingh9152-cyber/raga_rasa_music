@@ -3,7 +3,6 @@ Emotion detection model - Handles HSEmotion model loading and inference
 Part of integrated emotion detection service
 """
 
-import cv2
 import numpy as np
 import ssl
 import warnings
@@ -15,6 +14,36 @@ ssl._create_default_https_context = ssl._create_unverified_context
 warnings.filterwarnings("ignore")
 
 logger = logging.getLogger(__name__)
+
+
+def _patch_torch_load_for_hsemotion() -> None:
+    """Ensure HSEmotion checkpoints load on newer PyTorch defaults."""
+    try:
+        import torch
+
+        if getattr(torch.load, "_raga_rasa_patched", False):
+            return
+        original_load = torch.load
+
+        def patched_load(*args, **kwargs):
+            if "weights_only" not in kwargs:
+                kwargs["weights_only"] = False
+            return original_load(*args, **kwargs)
+
+        patched_load._raga_rasa_patched = True
+        torch.load = patched_load
+    except Exception as e:
+        logger.warning(f"[EmotionModel] torch.load patch skipped: {e}")
+
+
+def _load_cv2_or_none():
+    try:
+        import cv2
+
+        return cv2
+    except Exception as e:
+        logger.error(f"[EmotionModel] OpenCV import failed: {e}")
+        return None
 
 try:
     from hsemotion.facial_emotions import HSEmotionRecognizer
@@ -45,7 +74,16 @@ class EmotionModel:
         """Initialize emotion model and face cascade classifiers"""
         logger.info("[EmotionModel] Initializing emotion recognition model...")
 
+        self.cv2 = _load_cv2_or_none()
+        if self.cv2 is None:
+            logger.error("[EmotionModel] OpenCV unavailable; model disabled")
+            self.recognizer = None
+            self.face_cascade = None
+            self.face_cascade_alt = None
+            return
+
         try:
+            _patch_torch_load_for_hsemotion()
             # Load HSEmotion model (pretrained on AffectNet)
             self.recognizer = HSEmotionRecognizer(
                 model_name="enet_b0_8_best_afew", device="cpu"
@@ -56,11 +94,11 @@ class EmotionModel:
             self.recognizer = None
 
         # Load face cascade classifiers
-        self.face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        self.face_cascade = self.cv2.CascadeClassifier(
+            self.cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
         )
-        self.face_cascade_alt = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
+        self.face_cascade_alt = self.cv2.CascadeClassifier(
+            self.cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
         )
 
         logger.info("[EmotionModel] ✓ Face detection cascades loaded")
@@ -75,18 +113,22 @@ class EmotionModel:
         Returns:
             Tuple of (x, y, w, h) for the largest face, or None if no face detected
         """
+        if self.cv2 is None:
+            return None
         try:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            gray = cv2.equalizeHist(gray)
+            gray = self.cv2.cvtColor(frame, self.cv2.COLOR_BGR2GRAY)
+            gray = self.cv2.equalizeHist(gray)
 
             # Try both cascade classifiers
             for cascade in [self.face_cascade, self.face_cascade_alt]:
+                if cascade is None or cascade.empty():
+                    continue
                 faces = cascade.detectMultiScale(
                     gray,
                     scaleFactor=1.05,
                     minNeighbors=4,
                     minSize=(50, 50),
-                    flags=cv2.CASCADE_SCALE_IMAGE,
+                    flags=self.cv2.CASCADE_SCALE_IMAGE,
                 )
 
                 if len(faces) > 0:

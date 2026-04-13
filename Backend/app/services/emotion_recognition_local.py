@@ -4,9 +4,32 @@ import base64
 import ssl
 import warnings
 from typing import Any, Dict, Optional, Tuple
+import logging
 
 ssl._create_default_https_context = ssl._create_unverified_context
 warnings.filterwarnings("ignore")
+
+logger = logging.getLogger(__name__)
+
+
+def _patch_torch_load_for_hsemotion() -> None:
+    """Ensure HSEmotion checkpoints load on newer PyTorch defaults."""
+    try:
+        import torch
+
+        if getattr(torch.load, "_raga_rasa_patched", False):
+            return
+        original_load = torch.load
+
+        def patched_load(*args, **kwargs):
+            if "weights_only" not in kwargs:
+                kwargs["weights_only"] = False
+            return original_load(*args, **kwargs)
+
+        patched_load._raga_rasa_patched = True
+        torch.load = patched_load
+    except Exception as e:
+        logger.warning(f"[EmotionLocal] torch.load patch skipped: {e}")
 
 BRAVERY_THRESHOLD = 50
 HS_CLASSES = [
@@ -25,6 +48,7 @@ class EmotionRecognitionLocal:
     def __init__(self):
         self._initialized = False
         self._deps_available = False
+        self._last_error = None
         self._cv2 = None
         self._np = None
         self.recognizer = None
@@ -36,6 +60,7 @@ class EmotionRecognitionLocal:
             return self._deps_available and self.recognizer is not None
         self._initialized = True
         try:
+            _patch_torch_load_for_hsemotion()
             import cv2
             import numpy as np
             from hsemotion.facial_emotions import HSEmotionRecognizer
@@ -49,13 +74,17 @@ class EmotionRecognitionLocal:
             self.face_cascade_alt = cv2.CascadeClassifier(
                 cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
             )
+            self._last_error = None
             self._deps_available = True
+            logger.info("[EmotionLocal] Model initialized successfully")
             return True
-        except Exception:
+        except Exception as e:
             self.recognizer = None
             self.face_cascade = None
             self.face_cascade_alt = None
+            self._last_error = str(e)
             self._deps_available = False
+            logger.error(f"[EmotionLocal] Model initialization failed: {e}")
             return False
 
     def detect_from_base64(self, image_base64: str) -> Tuple[str, float, Dict[str, Any]]:

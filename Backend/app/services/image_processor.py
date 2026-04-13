@@ -4,13 +4,25 @@ Image preprocessing utilities for emotion detection
 
 import base64
 import io
-import cv2
 import numpy as np
 from typing import Tuple, Optional
 from PIL import Image
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def _load_cv2_or_none():
+    try:
+        import cv2
+
+        return cv2
+    except Exception as e:
+        logger.error(f"[ImageProcessor] OpenCV import failed: {e}")
+        return None
+
+
+_CV2 = _load_cv2_or_none()
 
 
 class ImageProcessor:
@@ -57,6 +69,8 @@ class ImageProcessor:
             OpenCV image (BGR numpy array) or None if conversion fails
         """
         try:
+            if _CV2 is None:
+                raise ValueError("OpenCV unavailable")
             # Remove data URI prefix if present
             if "," in base64_string:
                 base64_string = base64_string.split(",")[1]
@@ -72,7 +86,7 @@ class ImageProcessor:
 
             # Convert bytes to image
             image_array = np.frombuffer(image_bytes, dtype=np.uint8)
-            frame = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            frame = _CV2.imdecode(image_array, _CV2.IMREAD_COLOR)
 
             if frame is None:
                 raise ValueError("Failed to decode image data")
@@ -95,13 +109,15 @@ class ImageProcessor:
             OpenCV image (BGR numpy array) or None if conversion fails
         """
         try:
+            if _CV2 is None:
+                raise ValueError("OpenCV unavailable")
             if not ImageProcessor.validate_image_size(file_bytes):
                 raise ValueError(
                     f"Image size exceeds maximum limit of {ImageProcessor.MAX_IMAGE_SIZE} bytes"
                 )
 
             image_array = np.frombuffer(file_bytes, dtype=np.uint8)
-            frame = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            frame = _CV2.imdecode(image_array, _CV2.IMREAD_COLOR)
 
             if frame is None:
                 raise ValueError("Failed to decode image file")
@@ -160,11 +176,13 @@ class ImageProcessor:
             Normalized image
         """
         try:
+            if _CV2 is None:
+                return frame
             # Ensure frame is 3-channel BGR
             if len(frame.shape) == 2:
-                frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+                frame = _CV2.cvtColor(frame, _CV2.COLOR_GRAY2BGR)
             elif frame.shape[2] == 4:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+                frame = _CV2.cvtColor(frame, _CV2.COLOR_BGRA2BGR)
 
             return frame
         except Exception as e:

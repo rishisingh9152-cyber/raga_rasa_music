@@ -25,14 +25,12 @@ librosa==0.10.0
 
 # Emotion Detection
 hsemotion>=0.1.0
-fer==25.10.3
-deepface==0.0.67
 
 # Deep Learning & Models
 tensorflow==2.15.0
 h5py==3.10.0
-torch>=2.0.0
-torchvision>=0.15.0
+torch==2.5.1
+torchvision==0.20.1
 
 # Vector Search
 faiss-cpu==1.8.0
