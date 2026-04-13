@@ -205,7 +205,7 @@ async def detect_emotion(request: EmotionDetectRequest):
             },
         )
 
-         return EmotionDetectSchema(emotion=emotion, confidence=confidence, raw_dominant=emotion.lower())
+        return EmotionDetectSchema(emotion=emotion, confidence=confidence, raw_dominant=emotion.lower())
 
      except HTTPException:
          raise
