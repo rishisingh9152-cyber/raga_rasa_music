@@ -77,11 +77,19 @@ class Settings(BaseSettings):
     @property
     def ALLOWED_ORIGINS(self) -> list:
         """Parse ALLOWED_ORIGINS from comma-separated string"""
-        origins = []
+        # Always include these base URLs
+        origins = [
+            "https://raga-rasa-music-52.vercel.app",  # Production frontend
+            "http://localhost:5173",                   # Local dev
+            "http://localhost:8080",                   # Local dev alt
+            "http://127.0.0.1:5173",                   # Local dev alt
+            "http://127.0.0.1:8080",                   # Local dev alt
+        ]
+        
+        # Add any additional origins from environment variable
         if self.ALLOWED_ORIGINS_STR:
-            origins = [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
-        else:
-            origins = ["http://localhost:5173"]
+            additional = [origin.strip() for origin in self.ALLOWED_ORIGINS_STR.split(",")]
+            origins.extend(additional)
         
         return list(set(origins))  # Remove duplicates
     
