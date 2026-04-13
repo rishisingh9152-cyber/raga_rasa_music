@@ -4,7 +4,7 @@ Main FastAPI application entry point
 Restart: 2
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 import logging
 
@@ -89,6 +89,15 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def request_logging_middleware(request: Request, call_next):
+    """Lightweight request/response logging for production diagnostics."""
+    logger.info(f"[HTTP] {request.method} {request.url.path}")
+    response = await call_next(request)
+    logger.info(f"[HTTP] {request.method} {request.url.path} -> {response.status_code}")
+    return response
+
+
 # Route Includes
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(session.router, prefix="/api", tags=["session"])
@@ -119,6 +128,30 @@ async def db_test():
     except Exception as e:
         logger.error(f"[DBTest] Database test failed: {e}", exc_info=True)
         return {"status": "error", "message": str(e), "initialized": False}
+
+
+@app.get("/debug/runtime-status")
+async def runtime_status():
+    """Runtime diagnostics for Render/Vercel integration troubleshooting."""
+    from app.database import get_db
+
+    db = get_db()
+    return {
+        "service": "RagaRasa Music Therapy Backend",
+        "cors": {
+            "allowed_origins": settings.ALLOWED_ORIGINS,
+            "allowed_origin_regex": settings.ALLOWED_ORIGINS_REGEX,
+            "allowed_methods": settings.ALLOWED_METHODS,
+        },
+        "database": {
+            "initialized": db is not None,
+            "database_name": settings.DATABASE_NAME,
+        },
+        "emotion": {
+            "use_internal_model": getattr(settings, "USE_INTERNAL_EMOTION_MODEL", False),
+            "confidence_threshold": getattr(settings, "EMOTION_CONFIDENCE_THRESHOLD", 0.3),
+        },
+    }
 
 
 @app.get("/health")

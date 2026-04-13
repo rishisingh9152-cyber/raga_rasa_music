@@ -32,15 +32,14 @@ async def start_session(current_user: Optional[Dict[str, Any]] = Depends(get_cur
         logger.info(f"[Session Start] Initiating session creation: {session_id}")
         
         # Get database instance
-        try:
-            db = get_db()
-            logger.info(f"[Session Start] Database instance obtained")
-        except RuntimeError as db_err:
-            logger.error(f"[Session Start] Database not initialized: {db_err}")
+        db = get_db()
+        if db is None:
+            logger.error("[Session Start] Database not initialized")
             raise HTTPException(
                 status_code=503,
                 detail="Database service unavailable. Please ensure MongoDB is running."
             )
+        logger.info("[Session Start] Database instance obtained")
         
         # Create comprehensive session document
         session_doc = {
