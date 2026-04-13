@@ -29,7 +29,8 @@ def get_emotion_detector_lazy():
             _emotion_detector = get_emotion_detector()
         except ImportError as e:
             logger.error(f"[Emotion] Failed to load emotion detector: {e}")
-            raise HTTPException(status_code=503, detail="Emotion detection service unavailable")
+            # Do not fail hard in production; caller will use Neutral fallback
+            return None
     return _emotion_detector
 
 
@@ -96,23 +97,27 @@ async def detect_emotion(request: EmotionDetectRequest):
         
         # Get emotion detector instance (lazy-loaded)
         detector = get_emotion_detector_lazy()
-        
-        # Detect emotion from base64 image
-        try:
-            emotion, confidence = await detector.detect_from_base64(image_base64)
-            logger.info(f"[Emotion] Internal service returned: {emotion} (confidence: {confidence:.2f})")
-            
-            # Validate confidence threshold
-            threshold = getattr(settings, 'EMOTION_CONFIDENCE_THRESHOLD', 0.3)
-            if confidence < threshold:
-                emotion = 'Neutral'
-                logger.warning(f"[Emotion] Low confidence ({confidence:.2f}), defaulting to Neutral")
-        
-        except Exception as detection_err:
-            logger.warning(f"[Emotion] Internal emotion detection failed: {str(detection_err)}")
-            logger.info(f"[Emotion] Using fallback: assigning Neutral emotion")
+        if detector is None:
+            logger.warning("[Emotion] Detector unavailable, using Neutral fallback")
             emotion = 'Neutral'
             confidence = 0.5
+        else:
+            # Detect emotion from base64 image
+            try:
+                emotion, confidence = await detector.detect_from_base64(image_base64)
+                logger.info(f"[Emotion] Internal service returned: {emotion} (confidence: {confidence:.2f})")
+                
+                # Validate confidence threshold
+                threshold = getattr(settings, 'EMOTION_CONFIDENCE_THRESHOLD', 0.3)
+                if confidence < threshold:
+                    emotion = 'Neutral'
+                    logger.warning(f"[Emotion] Low confidence ({confidence:.2f}), defaulting to Neutral")
+            
+            except Exception as detection_err:
+                logger.warning(f"[Emotion] Internal emotion detection failed: {str(detection_err)}")
+                logger.info(f"[Emotion] Using fallback: assigning Neutral emotion")
+                emotion = 'Neutral'
+                confidence = 0.5
         
         # Ensure emotion is set
         if not emotion:
