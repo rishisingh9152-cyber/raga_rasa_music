@@ -11,6 +11,7 @@ from app.services.rasa_model import get_rasa_model
 from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
 from app.config import settings
+from app.services.external_emotion import get_emotion_service_client
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,26 @@ def get_emotion_detector_lazy():
     return _emotion_detector
 
 
+async def detect_with_external_service(image_base64: str):
+    """Use external emotion_recognition service endpoint."""
+    client = get_emotion_service_client()
+    emotion_raw, confidence = await client.predict_emotion(image_base64)
+    emotion_map = {
+        "happy": "Happy",
+        "neutral": "Neutral",
+        "sad": "Sad",
+        "angry": "Angry",
+        "fear": "Fearful",
+        "fearful": "Fearful",
+        "surprise": "Surprised",
+        "surprised": "Surprised",
+        "disgust": "Disgusted",
+        "disgusted": "Disgusted",
+    }
+    emotion = emotion_map.get(str(emotion_raw).lower(), "Neutral")
+    return emotion, float(confidence)
+
+
 @router.get("/emotion-service/health")
 async def emotion_service_health():
     """Health check for integrated backend detector."""
@@ -61,7 +82,7 @@ async def emotion_service_health():
                 "status": "degraded",
                 "service": "internal_emotion_recognition",
                 "mode": "fallback_neutral",
-                "external_service_used": False,
+                "external_service_used": settings.USE_EXTERNAL_EMOTION_SERVICE,
             }
 
         is_healthy = bool(getattr(detector, "recognizer", None) or getattr(detector, "detector", None))
@@ -70,14 +91,14 @@ async def emotion_service_health():
             "service": "internal_emotion_recognition",
             "model_type": getattr(detector, "model_type", "unknown"),
             "fallback_available": True,
-            "external_service_used": False,
+            "external_service_used": settings.USE_EXTERNAL_EMOTION_SERVICE,
         }
     except Exception as e:
         logger.error(f"[Emotion] Health check failed: {e}")
         return {
             "status": "error",
             "service": "internal_emotion_recognition",
-            "external_service_used": False,
+            "external_service_used": settings.USE_EXTERNAL_EMOTION_SERVICE,
             "error": str(e),
         }
 
@@ -102,7 +123,26 @@ async def detect_emotion(request: EmotionDetectRequest):
             )
 
         detector = get_emotion_detector_lazy()
-        if detector is None:
+        if settings.USE_EXTERNAL_EMOTION_SERVICE:
+            try:
+                emotion, confidence = await asyncio.wait_for(
+                    detect_with_external_service(image_base64),
+                    timeout=10.0,
+                )
+            except Exception as external_err:
+                logger.warning(f"[Emotion] External emotion service failed: {external_err}")
+                if detector is None:
+                    emotion, confidence = "Neutral", 0.5
+                else:
+                    try:
+                        emotion, confidence = await asyncio.wait_for(
+                            detector.detect_from_base64(image_base64),
+                            timeout=8.0,
+                        )
+                    except Exception as detection_err:
+                        logger.warning(f"[Emotion] Internal fallback failed: {detection_err}")
+                        emotion, confidence = "Neutral", 0.5
+        elif detector is None:
             emotion = "Neutral"
             confidence = 0.5
         else:
