@@ -60,15 +60,14 @@ def main():
     # Test health
     if not test_health():
         print("\n❌ Emotion service is not running at http://localhost:5000")
-        print("Please start the emotion recognition service first:")
-        print("  cd C:\\projects\\emotion_recognition")
-        print("  python api.py")
+        print("Note: Emotion detection is now integrated into the main backend")
+        print("This test is for legacy external emotion service only")
         return
     
     print("\n✅ Emotion service is healthy!")
     
     # Find a test image
-    snapshots_dir = Path("C:\\projects\\emotion_recognition\\snapshots")
+    snapshots_dir = Path("Backend/archived_emotion_service/snapshots")
     if snapshots_dir.exists():
         images = list(snapshots_dir.glob("*.jpg")) + list(snapshots_dir.glob("*.png"))
         if images:
@@ -80,7 +79,7 @@ def main():
             print(f"\n⚠️  No images found in {snapshots_dir}")
     else:
         print(f"\n⚠️  Snapshots directory not found at {snapshots_dir}")
-        print("Create a test image or use an existing one to test emotion detection")
+        print("Emotion detection is now integrated in Backend/app/services/emotion.py")
 
 if __name__ == "__main__":
     main()
