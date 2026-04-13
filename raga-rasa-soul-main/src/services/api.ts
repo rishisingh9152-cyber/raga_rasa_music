@@ -19,6 +19,21 @@ export interface Song {
   confidence: number;
 }
 
+const API_ORIGIN = (() => {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return "";
+  }
+})();
+
+const toAbsoluteAudioUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/") && API_ORIGIN) return `${API_ORIGIN}${url}`;
+  return url;
+};
+
 const normalizeSong = (song: any): Song | null => {
   if (!song || typeof song !== "object") return null;
   const id = song.song_id || song._id;
@@ -26,6 +41,7 @@ const normalizeSong = (song: any): Song | null => {
   return {
     ...song,
     song_id: song.song_id || song._id,
+    audio_url: toAbsoluteAudioUrl(song.audio_url),
   };
 };
 

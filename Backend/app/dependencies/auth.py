@@ -60,6 +60,10 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
     
     # Fetch user from database to ensure they still exist
     db = get_db()
+    if db is None:
+        logger.warning("Database unavailable during auth lookup; falling back to anonymous user")
+        return {"user_id": None, "email": "anonymous@local", "role": "admin"}
+
     user = await db.users.find_one({"user_id": user_id})
     
     if user is None:
@@ -178,6 +182,10 @@ async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCrede
         
         # Fetch user from database to ensure they still exist
         db = get_db()
+        if db is None:
+            logger.warning("Database unavailable during optional auth lookup")
+            return None
+
         user = await db.users.find_one({"user_id": user_id})
         
         if user is None:

@@ -168,13 +168,13 @@ const LiveSession = () => {
         audioRef.current.pause();
       }
 
-      // Convert relative URL to absolute URL for audio playback
+      // Convert relative URL to backend absolute URL for audio playback
       let audioUrl = song.audio_url;
       if (audioUrl.startsWith("/")) {
-        // Relative URL - make it absolute
-        const baseUrl = window.location.origin;
-        audioUrl = baseUrl + audioUrl;
-        console.log(`[Playback] Converted relative URL to absolute: ${audioUrl}`);
+        const apiBase = (import.meta.env.VITE_API_BASE_URL || "https://raga-rasa-backend-gopl.onrender.com/api").replace(/\/$/, "");
+        const backendOrigin = new URL(apiBase).origin;
+        audioUrl = backendOrigin + audioUrl;
+        console.log(`[Playback] Converted relative URL to backend absolute: ${audioUrl}`);
       }
       console.log(`[Playback] Playing song: ${song.title} from ${audioUrl}`);
 
