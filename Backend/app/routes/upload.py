@@ -1,8 +1,8 @@
 """Song upload and management endpoints with cloud storage support"""
 
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Body, Path as PathParam, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Body, Path as PathParam
 from fastapi.responses import FileResponse, StreamingResponse
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 import logging
 from pathlib import Path
 from pydantic import BaseModel
@@ -20,7 +20,6 @@ from app.services.song_upload import (
 from app.services.rasa_model import get_rasa_model
 from app.services.cloud_storage import get_storage_provider
 from app.config import settings
-from app.dependencies.auth import require_admin
 
 logger = logging.getLogger(__name__)
 
@@ -45,13 +44,10 @@ async def upload_song(
     title: str = Form(...),
     artist: Optional[str] = Form(None),
     emotion: str = Form("Neutral"),
-    file: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(require_admin)
+    file: UploadFile = File(...)
 ):
     """
     Upload a new song for automatic rasa classification
-    
-    **Admin only endpoint**
     
     The song is:
     1. Saved to temp storage
@@ -78,7 +74,7 @@ async def upload_song(
         if file_size_mb > 50:
             raise HTTPException(status_code=413, detail="File size exceeds 50MB limit")
         
-        logger.info(f"Admin {current_user.get('user_id')} uploading song: {file.filename}, size: {file_size_mb:.2f}MB")
+        logger.info(f"Uploading song: {file.filename}, size: {file_size_mb:.2f}MB")
         
         # Step 1: Save to temp directory
         temp_info = await save_uploaded_song(content, file.filename)
@@ -126,13 +122,10 @@ async def upload_song(
 
 @router.post("/songs/confirm-upload")
 async def confirm_upload(
-    request: ConfirmUploadRequest,
-    current_user: Dict[str, Any] = Depends(require_admin)
+    request: ConfirmUploadRequest
 ):
     """
     Confirm song upload and move to storage (cloud or local)
-    
-    **Admin only endpoint**
     
     Args:
         request: ConfirmUploadRequest with temp_path, title, artist, rasa
@@ -158,7 +151,7 @@ async def confirm_upload(
         
         # Step 1: Move file to storage (cloud or local)
         move_result = await move_song_to_rasa_folder(temp_path, rasa, title, use_cloud=use_cloud)
-        logger.info(f"Admin {current_user.get('user_id')} confirmed song upload to {move_result.get('storage_type', 'local')}: {move_result.get('final_path')}")
+        logger.info(f"Confirmed song upload to {move_result.get('storage_type', 'local')}: {move_result.get('final_path')}")
         
         # Step 2: Store in database with metadata
         db = get_db()
@@ -193,7 +186,7 @@ async def confirm_upload(
                 "tempo": 100
             },
             "created_at": datetime.utcnow() if 'datetime' in dir() else __import__('datetime').datetime.utcnow(),
-            "uploaded_by": current_user.get("user_id")
+            "uploaded_by": None
         }
         
         # Insert into database

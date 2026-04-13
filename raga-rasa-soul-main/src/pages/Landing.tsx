@@ -37,17 +37,17 @@ const Landing = () => {
                 Register
               </motion.button>
             </>
-           ) : (
-             <>
-               <span className="text-purple-200 text-sm">{user?.email}</span>
-               <motion.button
+            ) : (
+              <>
+                <span className="text-purple-200 text-sm">{user?.email}</span>
+                <motion.button
                  whileHover={{ scale: 1.05 }}
                  whileTap={{ scale: 0.95 }}
-                 onClick={() => navigate(user?.role === 'admin' ? '/admin' : '/dashboard')}
-                 className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-sm"
-               >
-                 {user?.role === 'admin' ? 'Admin' : 'Dashboard'}
-               </motion.button>
+                  onClick={() => navigate('/dashboard')}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition text-sm"
+                >
+                  Dashboard
+                </motion.button>
                <motion.button
                  whileHover={{ scale: 1.05 }}
                  whileTap={{ scale: 0.95 }}
@@ -121,7 +121,7 @@ const Landing = () => {
             transition={{ delay: 0.9, duration: 0.4 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => isAuthenticated ? navigate(user?.role === 'admin' ? '/admin' : '/dashboard') : navigate('/login')}
+            onClick={() => isAuthenticated ? navigate('/dashboard') : navigate('/login')}
             className="glow-button text-sm sm:text-lg flex items-center gap-2 mx-auto animate-pulse-glow"
           >
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />

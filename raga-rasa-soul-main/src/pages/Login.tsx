@@ -23,13 +23,7 @@ const Login: React.FC = () => {
       // Get the user role from context to redirect
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
-        const user = JSON.parse(storedUser);
-        // Redirect based on role
-        if (user.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed. Please try again.');

@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SessionProvider } from "@/context/SessionContext";
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import AdminDashboard from "./pages/AdminDashboard";
 import DashboardLayout from "./pages/DashboardLayout";
 import DashboardHome from "./pages/DashboardHome";
 import Profile from "./pages/Profile";
@@ -47,16 +46,6 @@ const App = () => (
                 <Route path="session" element={<Session />} />
                 <Route path="upload" element={<SongUpload />} />
               </Route>
-              
-              {/* Protected admin routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -74,10 +74,7 @@ async def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] =
 
 
 async def require_admin(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
-    """
-    Dependency to ensure current user is an admin.
-    """
-    # No-auth mode: admin checks disabled
+    """Backward-compatible alias; admin role checks removed."""
     return current_user
 
 

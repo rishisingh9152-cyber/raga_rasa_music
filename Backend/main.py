@@ -10,7 +10,7 @@ import logging
 
 from app.config import settings
 from app.database import init_db, close_db
-from app.routes import session, emotion, recommendation, rating, history, catalog, upload, psychometric, images, auth, admin
+from app.routes import session, emotion, recommendation, rating, history, catalog, upload, psychometric, images, auth
 from app.services.cache import init_redis
 from app.services.song_upload import initialize_directories
 from app.services.rate_limiting import limiter
@@ -100,7 +100,6 @@ app.include_router(catalog.router, prefix="/api", tags=["catalog"])
 app.include_router(upload.router, prefix="/api", tags=["upload"])
 app.include_router(psychometric.router, prefix="/api", tags=["psychometric"])
 app.include_router(images.router, prefix="/api", tags=["images"])
-app.include_router(admin.router, prefix="/api", tags=["admin"])
 
 
 @app.get("/db-test")

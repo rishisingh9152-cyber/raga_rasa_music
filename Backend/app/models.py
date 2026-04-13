@@ -34,22 +34,6 @@ class TokenPayloadSchema(BaseModel):
     exp: float
 
 
-class PromoteUserSchema(BaseModel):
-    """Schema for promoting user to admin"""
-    user_id: str
-
-
-class DemoteAdminSchema(BaseModel):
-    """Schema for demoting admin to user"""
-    user_id: str
-
-
-class AdminSetupSchema(BaseModel):
-    """Schema for setting up first admin"""
-    email: EmailStr
-    password: str = Field(..., min_length=8, description="Minimum 8 characters")
-
-
 # ==================== Song Schemas ====================
 
 class SongAudioFeaturesSchema(BaseModel):

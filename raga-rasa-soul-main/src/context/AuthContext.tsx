@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface User {
   user_id: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 'user';
 }
 
 interface AuthContextType {
@@ -14,7 +14,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  setupAdmin: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,7 +28,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const guestUser: User = {
       user_id: 'guest',
       email: 'guest@local',
-      role: 'admin',
+      role: 'user',
     };
     setUser(guestUser);
     setToken('guest-token');
@@ -46,16 +45,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return;
   };
 
-  const setupAdmin = async (_email: string, _password: string) => {
-    return;
-  };
-
   const logout = () => {
     // No-auth mode keeps app accessible; reset to guest identity.
     const guestUser: User = {
       user_id: 'guest',
       email: 'guest@local',
-      role: 'admin',
+      role: 'user',
     };
     localStorage.setItem('auth_token', 'guest-token');
     localStorage.setItem('user', JSON.stringify(guestUser));
@@ -71,7 +66,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     login,
     register,
     logout,
-    setupAdmin,
   };
 
   return (
