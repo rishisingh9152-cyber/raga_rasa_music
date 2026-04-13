@@ -1,5 +1,8 @@
 // API Base URL - configurable via environment variable
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
+// IMPORTANT: Must include /api suffix or full URL with /api
+// In production: use VITE_API_BASE_URL env variable
+// Fallback for dev: uses relative /api (proxied in vite.config.ts to http://localhost:8000/api)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
 
 // ============================================================================
 // TYPE DEFINITIONS

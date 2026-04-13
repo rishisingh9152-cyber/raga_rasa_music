@@ -156,6 +156,25 @@ async def get_ragas_list(rasa: Optional[str] = None):
         raise HTTPException(status_code=500, detail=f"Failed to fetch ragas list: {str(e)}")
 
 
+@router.get("/songs/by-rasa", response_model=List[SongSchema])
+async def get_songs_by_rasa(rasa: Optional[str] = None):
+    """
+    Frontend-compatible endpoint: /songs/by-rasa
+    
+    This is an alias for /ragas/list to match frontend expectations
+    Frontend calls this endpoint (api.ts line 209) instead of /ragas/list
+    
+    Args:
+        rasa: Optional filter by rasa (Shringar, Shaant, Veer, Shok)
+    
+    Returns:
+        List of songs (ragas) with audio URLs
+    """
+    logger.info(f"[Catalog] GET /songs/by-rasa endpoint called (rasa={rasa})")
+    # Delegate to existing get_ragas_list function
+    return await get_ragas_list(rasa=rasa)
+
+
 @router.get("/ragas/{raga_id}", response_model=RagaSchema)
 async def get_raga_details(raga_id: str):
     """

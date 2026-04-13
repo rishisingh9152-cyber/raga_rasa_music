@@ -1,0 +1,418 @@
+{
+  "total_songs": 59,
+  "sample_songs": [
+    {
+      "title": "Desh Amjadalikhan Hasya Shant",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008143/raga-rasa/songs/Shaant/desh_amjadalikhan_hasya_shant.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb0"
+    },
+    {
+      "title": "Kamaj Amjadalikhan Shant",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008157/raga-rasa/songs/Shaant/kamaj_amjadalikhan_shant.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb1"
+    },
+    {
+      "title": "Malkuans Amjadalikhan Shant",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008175/raga-rasa/songs/Shaant/malkuans_amjadalikhan_shant.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb2"
+    },
+    {
+      "title": "Ahir Bhairav Albela Sajan Full Video Song Hum Dil De Chuke Sanam Ismail Darbar Salman Khan A M2yzx4es",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008181/raga-rasa/songs/Shaant/raag-ahir-bhairav-albela-sajan-full-video-song-hum-dil-de-chuke-sanam-ismail-darbar-salman-khan-a_m2yzx4es.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb3"
+    },
+    {
+      "title": "Ahir Bhairav Apne Jeevan Ki Uljhan Ko [hd] Hindi Classic Songs Sulakshana Pandit Lata Mangeshkar Uljhan 1975",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008183/raga-rasa/songs/Shaant/raag-ahir-bhairav-apne%20jeevan%20ki%20uljhan%20ko%20%5Bhd%5D%20hindi%20classic%20songs_%20sulakshana%20pandit%20%20lata%20mangeshkar%20%20uljhan%201975.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb4"
+    },
+    {
+      "title": "Ahir Bhairav Jago Mohan Pyare Raag Bhairav Riyaz Daily",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008184/raga-rasa/songs/Shaant/raag-ahir-bhairav-jago%20mohan%20pyare%20%20raag%20bhairav%20%20riyaz%20daily.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb5"
+    },
+    {
+      "title": "Ahir Bhairav Ka Karoon Sajani Aaye Swami 1977 Songs Shabana Azmi Dheeraj Kumar Yesudas Filmig Jmyj3zi7",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008187/raga-rasa/songs/Shaant/raag-ahir-bhairav-ka-karoon-sajani-aaye-swami-1977-songs-shabana-azmi-dheeraj-kumar-yesudas-filmig_jmyj3zi7.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb6"
+    },
+    {
+      "title": "Ahir Bhairav Madhuban Mein Radhika Nache Re Hd Jfoovwc0",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008188/raga-rasa/songs/Shaant/raag-ahir-bhairav-madhuban-mein-radhika-nache-re-hd_jfoovwc0.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb7"
+    },
+    {
+      "title": "Ahir Bhairav Man Anand Anand Chhayo",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008190/raga-rasa/songs/Shaant/raag-ahir-bhairav-man%20anand%20anand%20chhayo.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb8"
+    },
+    {
+      "title": "Ahir Bhairav Man Anand Anand Chhayo 5q8lh6bn",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008192/raga-rasa/songs/Shaant/raag-ahir-bhairav-man-anand-anand-chhayo_5q8lh6bn.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddb9"
+    },
+    {
+      "title": "Ahir Bhairav Prabhu Tero Naam Jo Dhyaye Lata Mangeshkar Sahir Ludhianvi Hum Dono",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008193/raga-rasa/songs/Shaant/raag-ahir-bhairav-prabhu%20tero%20naam%20jo%20dhyaye%20%20lata%20mangeshkar%20%20sahir%20ludhianvi%20%20hum%20dono.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddba"
+    },
+    {
+      "title": "Ahir Bhairav Ram Ka Gungaan Kariye By Pandit Bhimsen Joshi & Lata Mangeshkar",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008519/raga-rasa/songs/Shaant/raag-ahir-bhairav-ram%20ka%20gungaan%20kariye%20by%20pandit%20bhimsen%20joshi%20and%20lata%20mangeshkar.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddbb"
+    },
+    {
+      "title": "Ahir Bhairav मधबन म रधक नच र Madhuban Mein Radhika Nache Re Hd वडय सग महममद रफ",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008198/raga-rasa/songs/Shaant/raag-ahir-bhairav-%E0%A4%AE%E0%A4%A7%E0%A4%AC%E0%A4%A8%20%E0%A4%AE%20%E0%A4%B0%E0%A4%A7%E0%A4%95%20%E0%A4%A8%E0%A4%9A%20%E0%A4%B0%20madhuban%20mein%20radhika%20nache%20re%20-%20hd%20%E0%A4%B5%E0%A4%A1%E0%A4%AF%20%E0%A4%B8%E0%A4%97%20-%20%E0%A4%AE%E0%A4%B9%E0%A4%AE%E0%A4%AE%E0%A4%A6%20%E0%A4%B0%E0%A4%AB.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddbc"
+    },
+    {
+      "title": "Bhupali Chanda Hai Tu Lata Mangeshkar",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008200/raga-rasa/songs/Shaant/raag-bhupali-chanda-hai-tu-lata-mangeshkar.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddbd"
+    },
+    {
+      "title": "Bhupali Dehachi Tijori Bhaktichach Theva Marathi Prarthana Ughad Daar Deva Aata",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008202/raga-rasa/songs/Shaant/raag-bhupali-dehachi%20tijori%20bhaktichach%20theva%20%20marathi%20prarthana%20%20ughad%20daar%20deva%20aata.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddbe"
+    },
+    {
+      "title": "Bhupali Dekha Ek Khwab Song Silsila Amitabh Bachchan, Rekha Kishore Kumar, Lata Mangeshkar, Shiv Hari",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008204/raga-rasa/songs/Shaant/raag-bhupali-dekha%20ek%20khwab%20song%20%20silsila%20%20amitabh%20bachchan%2C%20rekha%20%20kishore%20kumar%2C%20lata%20mangeshkar%2C%20shiv-hari.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddbf"
+    },
+    {
+      "title": "Bhupali Kanchi Re Kanchi Re Hare Rama Hare Krishna",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008207/raga-rasa/songs/Shaant/raag-bhupali-kanchi%20re%20kanchi%20re%20%20%20hare%20rama%20hare%20krishna.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc0"
+    },
+    {
+      "title": "Bhupali Mere To Giridhar Gopalms Subbulakshmimeera",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008209/raga-rasa/songs/Shaant/raag-bhupali-mere%20to%20giridhar%20gopalms%20subbulakshmimeera.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc1"
+    },
+    {
+      "title": "Bhupali Panchhi Banoo Udti Phiroon Lata Mangeshkar Nargis",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008211/raga-rasa/songs/Shaant/raag-bhupali-panchhi%20banoo%20udti%20phiroon-lata-mangeshkar-nargis.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc2"
+    },
+    {
+      "title": "Bhupali Umrao Jaan In Aankhon Ki Masti",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008214/raga-rasa/songs/Shaant/raag-bhupali-umrao%20jaan%20%20-%20in%20aankhon%20ki%20masti.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc3"
+    },
+    {
+      "title": "Kalyan Aaye Ho Meri Zindagi Mein Alka Yagnik Raja Hindustani 1996",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008218/raga-rasa/songs/Shaant/raag-kalyan-aaye%20ho%20meri%20zindagi%20mein%20%20alka%20yagnik%20%20raja%20hindustani%20%201996.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc4"
+    },
+    {
+      "title": "Kalyan Aaye Ho Meri Zindagi Mein (male) Aamir, Karisma Udit Narayan Raja Hindustani 90's Hit Hindi",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008220/raga-rasa/songs/Shaant/raag-kalyan-aaye%20ho%20meri%20zindagi%20mein%20%28male%29%20%20aamir%2C%20karisma%20%20udit%20narayan%20%20raja%20hindustani%20%2090%27s%20hit%20hindi.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc5"
+    },
+    {
+      "title": "Kalyan Abhi Na Jao Chor Kar Ke Dil Abhi Bhara Nahi",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008222/raga-rasa/songs/Shaant/raag-kalyan-abhi%20na%20jao%20chor%20kar%20ke%20dil%20abhi%20bhara%20nahi.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc6"
+    },
+    {
+      "title": "Kalyan Chandan Sa Badan (maleversion) (hd) Saraswatichandra Nutan Manish Bollywood Evergreen Songs",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008224/raga-rasa/songs/Shaant/raag-kalyan-chandan%20sa%20badan%20%28maleversion%29%20%28hd%29%20-%20saraswatichandra%20-%20nutan%20-%20manish%20-%20bollywood%20evergreen%20songs.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc7"
+    },
+    {
+      "title": "Shaant Aa Neele Gagan Tale Pyar Hum Kare Badshah Hemant Kumar And Lata",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008226/raga-rasa/songs/Shaant/raag-shaant-aa-neele-gagan-tale-pyar-hum-kare---badshah---hemant-kumar-and-lata.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc8"
+    },
+    {
+      "title": "Shaant Bhairavi Mohe Bhool Gaye",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008228/raga-rasa/songs/Shaant/raag-shaant-raag-bhairavi-mohe-bhool-gaye.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddc9"
+    },
+    {
+      "title": "Shaant Test Upload Song",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008231/raga-rasa/songs/Shaant/raag-shaant-test-upload-song.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddca"
+    },
+    {
+      "title": "Shree At Sunset Manjusha Patil",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008236/raga-rasa/songs/Shaant/raag-shree-at-sunset-manjusha-patil.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddcb"
+    },
+    {
+      "title": "Shree Pt Venkatesh Kumar Bazm E Khas",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008240/raga-rasa/songs/Shaant/raag-shree-pt-venkatesh-kumar-bazm-e-khas.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddcc"
+    },
+    {
+      "title": "Shree Vidushi Shruti Sadolikar Katkar Kaha Main Guru Dhundan Sumira Kar L R1mxdmst",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008245/raga-rasa/songs/Shaant/raga-shree-vidushi-shruti-sadolikar-katkar-kaha-main-guru-dhundan-sumira-kar-l_r1mxdmst.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddcd"
+    },
+    {
+      "title": "Shree Vidushi Shruti Sadolikar Katkar Kaha Main Guru Dhundan Sumira Kar L Xusupgu3",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008249/raga-rasa/songs/Shaant/raga-shree-vidushi-shruti-sadolikar-katkar-kaha-main-guru-dhundan-sumira-kar-l_xusupgu3.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddce"
+    },
+    {
+      "title": "Yaman Gundechabros Shant",
+      "rasa": "Shaant",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008266/raga-rasa/songs/Shaant/yaman_gundechabros_shant.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddcf"
+    },
+    {
+      "title": "Desh Amjadalikhan Hasya Shant",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008272/raga-rasa/songs/Shok/Desh_amjadalikhan_hasya_shant.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd0"
+    },
+    {
+      "title": "Bhopaltodi Aliakbarkhan Shok",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008280/raga-rasa/songs/Shok/bhopaltodi_aliakbarkhan_shok.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd1"
+    },
+    {
+      "title": "Jogiya Amjadalikhan Shok",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008284/raga-rasa/songs/Shok/jogiya_amjadalikhan_shok.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd2"
+    },
+    {
+      "title": "Kaushiki Chakraborty Bhairavi Shadaj 2021 Uk9l91js",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008291/raga-rasa/songs/Shok/kaushiki-chakraborty-raag-bhairavi-shadaj-2021_uk9l91js.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd3"
+    },
+    {
+      "title": "Marwa Kushaldas Shok",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008306/raga-rasa/songs/Shok/marwa_kushaldas_shok.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd4"
+    },
+    {
+      "title": "Bhairavi Awara Hoon Raj Kapoor Nargis Awaara Mukesh Evergreen Bollywood Song",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008310/raga-rasa/songs/Shok/raag-bhairavi-awara%20hoon%20%20raj%20kapoor%20nargis%20%20awaara%20%20mukesh%20%20evergreen%20bollywood%20song.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd5"
+    },
+    {
+      "title": "Bhairavi Babul Mora Naihar Chhooto Jaye बबल मर नहर Chitra Singh Jagjit Singh Ghazals Ghazal Songs",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008313/raga-rasa/songs/Shok/raag-bhairavi-babul%20mora%20naihar%20chhooto%20jaye%20%20%E0%A4%AC%E0%A4%AC%E0%A4%B2%20%E0%A4%AE%E0%A4%B0%20%E0%A4%A8%E0%A4%B9%E0%A4%B0%20chitra%20singh%20%20jagjit%20singh%20ghazals%20%20ghazal%20songs.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd6"
+    },
+    {
+      "title": "Bhairavi Ka Karoon Sajani Aaye Swami 1977 Songs Shabana Azmi Dheeraj Kumar Yesudas Filmigaane (1)",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008316/raga-rasa/songs/Shok/raag-bhairavi-ka%20karoon%20sajani%20aaye%20-%20swami%201977%20songs%20-%20shabana%20azmi%20-%20dheeraj%20kumar%20-%20yesudas%20-%20filmigaane%20%281%29.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd7"
+    },
+    {
+      "title": "Bhairavi Suno Chhoti Si Gudiya Ki Kahani (happy) Lata Mangeshkar Songs Nutan Seema (1955) Movie Songs",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008317/raga-rasa/songs/Shok/raag-bhairavi-suno%20chhoti%20si%20gudiya%20ki%20kahani%20%28happy%29%20-%20lata%20mangeshkar%20songs%20%20nutan%20%20seema%20%281955%29%20movie%20songs.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd8"
+    },
+    {
+      "title": "Bhairavi ऐ मलक तर बद हम Aye Malik Tere Bande Hum Hd वडय सग लत मगशकर, मनन ड",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008319/raga-rasa/songs/Shok/raag-bhairavi-%E0%A4%90%20%E0%A4%AE%E0%A4%B2%E0%A4%95%20%E0%A4%A4%E0%A4%B0%20%E0%A4%AC%E0%A4%A6%20%E0%A4%B9%E0%A4%AE%20aye%20malik%20tere%20bande%20hum%20-%20hd%20%E0%A4%B5%E0%A4%A1%E0%A4%AF%20%E0%A4%B8%E0%A4%97%20-%20%E0%A4%B2%E0%A4%A4%20%E0%A4%AE%E0%A4%97%E0%A4%B6%E0%A4%95%E0%A4%B0%2C%20%E0%A4%AE%E0%A4%A8%E0%A4%A8%20%E0%A4%A1.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddd9"
+    },
+    {
+      "title": "Darbari Kanada Dil Jalta Hai To Jalne De Mukesh Film Pehli Nazar (1945) Anil Biswas Safdar Aah Sitapuri",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008321/raga-rasa/songs/Shok/raag-darbari-kanada-dil%20jalta%20hai%20to%20jalne%20de%20mukesh%20film%20pehli%20nazar%20%281945%29%20anil%20biswas%20%20safdar%20aah%20sitapuri.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddda"
+    },
+    {
+      "title": "Darbari Kanada Jane Kahan Gaye Woh Din With Lyrics जन कह गए वह दन क बल Mukesh",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008324/raga-rasa/songs/Shok/raag-darbari-kanada-jane%20kahan%20gaye%20woh%20din%20with%20lyrics%20%20%E0%A4%9C%E0%A4%A8%20%E0%A4%95%E0%A4%B9%20%E0%A4%97%E0%A4%8F%20%E0%A4%B5%E0%A4%B9%20%E0%A4%A6%E0%A4%A8%20%E0%A4%95%20%E0%A4%AC%E0%A4%B2%20%20%20mukesh.mp3",
+      "_id": "69dbbaf0aec0f9767cfedddb"
+    },
+    {
+      "title": "Darbari Kanada Jhanak Jhanak Tori Baaje Payaliya Manna Dey Film Mere Huzoor(1968)md Shankar Jaikishan Ly Hasrat",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008326/raga-rasa/songs/Shok/raag-darbari-kanada-jhanak%20jhanak%20tori%20baaje%20payaliya-%20manna%20dey%20-film-mere%20huzoor%281968%29md-shankar%20jaikishan%20ly-hasrat.mp3",
+      "_id": "69dbbaf0aec0f9767cfedddc"
+    },
+    {
+      "title": "Darbari Kanada Koi Matwala 4k Video Song कई मतवल Lata Mangeshkar Asha Parkeh Love In Tokyo",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008327/raga-rasa/songs/Shok/raag-darbari-kanada-koi%20matwala%204k%20video%20song%20%20%E0%A4%95%E0%A4%88%20%E0%A4%AE%E0%A4%A4%E0%A4%B5%E0%A4%B2%20%20lata%20mangeshkar%20%20asha%20parkeh%20%20love%20in%20tokyo.mp3",
+      "_id": "69dbbaf0aec0f9767cfedddd"
+    },
+    {
+      "title": "Darbari Kanada Mohabbat Ki Jhooti Kahani Pe Roye Lata Mangeshkar Madhubala Mughal E Azam",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008329/raga-rasa/songs/Shok/raag-darbari-kanada-mohabbat%20ki%20jhooti%20kahani%20pe%20roye%20-%20lata%20mangeshkar%20%20madhubala%20%20mughal-e-azam.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddde"
+    },
+    {
+      "title": "Darbari Kanada O Duniya Ke Rakhwale (hd) Baiju Bawra Songs Meena Kumari Bharat Bhushan Naushad Hits",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008331/raga-rasa/songs/Shok/raag-darbari-kanada-o%20duniya%20ke%20rakhwale%20%28hd%29%20%20baiju%20bawra%20songs%20%20meena%20kumari%20%20bharat%20bhushan%20%20naushad%20hits.mp3",
+      "_id": "69dbbaf0aec0f9767cfedddf"
+    },
+    {
+      "title": "Raga Jogia Hindustani Classical Vocalist Sanchaita Chaudhuri",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008335/raga-rasa/songs/Shok/raga%20jogia%20%20hindustani%20classical%20vocalist%20%20sanchaita%20chaudhuri.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde0"
+    },
+    {
+      "title": "Bhairavi Bharava Pt Hariprasad Chaurasia Flute Music",
+      "rasa": "Shok",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008338/raga-rasa/songs/Shok/raga-bhairavi-raga-bharava-pt-hariprasad-chaurasia-flute-music.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde1"
+    },
+    {
+      "title": "Bahar Amjadalikhan Rati",
+      "rasa": "Shringar",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008345/raga-rasa/songs/Shringar/bahar_amjadalikhan_rati.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde2"
+    },
+    {
+      "title": "Bilkashanitodi Kushaldas Rati",
+      "rasa": "Shringar",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008358/raga-rasa/songs/Shringar/bilkashanitodi_kushaldas_rati.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde3"
+    },
+    {
+      "title": "Purbayan Chatterjee Yaman Shringar",
+      "rasa": "Shringar",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008368/raga-rasa/songs/Shringar/purbayan%20chatterjee_yaman_shringar.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde4"
+    },
+    {
+      "title": "Adana Nikhilbanerjee Veer",
+      "rasa": "Veer",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008373/raga-rasa/songs/Veer/adana_nikhilbanerjee_veer.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde5"
+    },
+    {
+      "title": "Bahar Amjadalikhan Veer",
+      "rasa": "Veer",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008382/raga-rasa/songs/Veer/bahar_amjadalikhan_veer.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde6"
+    },
+    {
+      "title": "Bhimpalasi Kushaldas Veer",
+      "rasa": "Veer",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008385/raga-rasa/songs/Veer/bhimpalasi_kushaldas_veer.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde7"
+    },
+    {
+      "title": "Veer Aa Neele Gagan Tale Pyar Hum Kare Badshah Hemant Kumar And Lata",
+      "rasa": "Veer",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008387/raga-rasa/songs/Veer/raag-veer-aa-neele-gagan-tale-pyar-hum-kare---badshah---hemant-kumar-and-lata.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde8"
+    },
+    {
+      "title": "Bahaduri Todi By Manjiri Asanare Kelkar",
+      "rasa": "Veer",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008390/raga-rasa/songs/Veer/raga-bahaduri-todi-by-manjiri-asanare-kelkar.mp3",
+      "_id": "69dbbaf0aec0f9767cfedde9"
+    },
+    {
+      "title": "Bahaduri Todi Vidushi Dr Ashwini Bhide Deshpande Pashupati Naath Akqw 11t5brl9",
+      "rasa": "Veer",
+      "raag": "Unknown",
+      "audio_url": "https://res.cloudinary.com/dlx3ufj3t/video/upload/v1776008392/raga-rasa/songs/Veer/raga-bahaduri-todi-vidushi-dr-ashwini-bhide-deshpande-pashupati-naath-akqw_11t5brl9.mp3",
+      "_id": "69dbbaf0aec0f9767cfeddea"
+    }
+  ]
+}

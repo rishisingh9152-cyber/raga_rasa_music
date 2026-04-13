@@ -10,6 +10,8 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    // Proxy only used in development (for local testing)
+    // In production, VITE_API_BASE_URL env var configures the backend URL
     proxy: {
       "/api": {
         target: "http://localhost:8000",

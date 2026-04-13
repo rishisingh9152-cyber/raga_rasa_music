@@ -1,4 +1,4 @@
-"""Emotion detection endpoints"""
+"""Emotion detection endpoints - Integrated with HSEmotion model"""
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -6,7 +6,7 @@ import logging
 import traceback
 
 from app.database import get_db
-from app.services.external_emotion import get_emotion_service_client, check_emotion_service
+from app.services.emotion import get_emotion_detector
 from app.services.rasa_model import get_rasa_model
 from app.models import EmotionDetectSchema
 from app.services.cache import cache_get, cache_set
@@ -15,9 +15,6 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-# Flag to track which service to use
-USE_EXTERNAL_SERVICE = getattr(settings, 'USE_EXTERNAL_EMOTION_SERVICE', True)
 
 
 class EmotionDetectRequest(BaseModel):
@@ -30,17 +27,19 @@ class EmotionDetectRequest(BaseModel):
 async def emotion_service_health():
     """Check if emotion recognition service is available"""
     try:
-        is_healthy = await check_emotion_service()
+        detector = get_emotion_detector()
+        is_healthy = detector.recognizer is not None or detector.detector is not None
         return {
             "status": "healthy" if is_healthy else "unavailable",
-            "service": "external_emotion_recognition",
+            "service": "internal_emotion_recognition",
+            "model_type": detector.model_type,
             "fallback_available": True
         }
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
+        logger.error(f"[Emotion] Health check failed: {e}")
         return {
             "status": "error",
-            "service": "external_emotion_recognition",
+            "service": "internal_emotion_recognition",
             "error": str(e)
         }
 
@@ -48,14 +47,14 @@ async def emotion_service_health():
 @router.post("/detect-emotion", response_model=EmotionDetectSchema)
 async def detect_emotion(request: EmotionDetectRequest):
     """
-    Detect emotion from webcam image using external service with fallback
+    Detect emotion from webcam image using integrated HSEmotion model
     
     Args:
         image_base64: Base64 encoded JPEG image from frontend
         session_id: Session identifier for tracking
     
     Returns:
-        Detected emotion label
+        Detected emotion label with confidence score
     """
     try:
         # Handle case where frontend sends data URI prefix
@@ -77,16 +76,15 @@ async def detect_emotion(request: EmotionDetectRequest):
                 raw_dominant=cached_emotion.lower()
             )
         
-        logger.info(f"[Emotion] Attempting external emotion detection for session: {request.session_id}")
+        logger.info(f"[Emotion] Attempting emotion detection for session: {request.session_id}")
         
-        # Try to use external emotion recognition service
-        emotion = None
-        confidence = 0.5
+        # Get emotion detector instance
+        detector = get_emotion_detector()
         
+        # Detect emotion from base64 image
         try:
-            client = get_emotion_service_client()
-            emotion, confidence = await client.predict_emotion(image_base64)
-            logger.info(f"[Emotion] External service returned: {emotion} (confidence: {confidence:.2f})")
+            emotion, confidence = await detector.detect_from_base64(image_base64)
+            logger.info(f"[Emotion] Internal service returned: {emotion} (confidence: {confidence:.2f})")
             
             # Validate confidence threshold
             threshold = getattr(settings, 'EMOTION_CONFIDENCE_THRESHOLD', 0.3)
@@ -94,8 +92,8 @@ async def detect_emotion(request: EmotionDetectRequest):
                 emotion = 'Neutral'
                 logger.warning(f"[Emotion] Low confidence ({confidence:.2f}), defaulting to Neutral")
         
-        except Exception as service_err:
-            logger.warning(f"[Emotion] External service unavailable: {str(service_err)}")
+        except Exception as detection_err:
+            logger.warning(f"[Emotion] Internal emotion detection failed: {str(detection_err)}")
             logger.info(f"[Emotion] Using fallback: assigning Neutral emotion")
             emotion = 'Neutral'
             confidence = 0.5
