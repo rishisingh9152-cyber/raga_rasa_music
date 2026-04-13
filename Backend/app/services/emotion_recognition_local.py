@@ -27,13 +27,25 @@ HS_CLASSES = [
 
 class EmotionRecognitionLocal:
     def __init__(self):
-        self.recognizer = HSEmotionRecognizer(model_name="enet_b0_8_best_afew", device="cpu")
+        self._initialized = False
+        self.recognizer = None
         self.face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
         )
         self.face_cascade_alt = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml"
         )
+
+    def _ensure_model(self) -> bool:
+        if self._initialized:
+            return self.recognizer is not None
+        self._initialized = True
+        try:
+            self.recognizer = HSEmotionRecognizer(model_name="enet_b0_8_best_afew", device="cpu")
+            return True
+        except Exception:
+            self.recognizer = None
+            return False
 
     def detect_from_base64(self, image_base64: str) -> Tuple[str, float, Dict[str, Any]]:
         if image_base64.startswith("data:"):
@@ -74,6 +86,9 @@ class EmotionRecognitionLocal:
         y2 = min(frame.shape[0], y + h + pad)
         face_crop = frame[y1:y2, x1:x2]
         if face_crop.size == 0:
+            return empty
+
+        if not self._ensure_model():
             return empty
 
         try:

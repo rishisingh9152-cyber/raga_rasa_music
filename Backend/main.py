@@ -14,7 +14,7 @@ from app.routes import session, emotion, recommendation, rating, history, catalo
 from app.services.cache import init_redis
 from app.services.song_upload import initialize_directories
 from app.services.rate_limiting import limiter
-from app.middleware.cors import CustomCORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -78,7 +78,7 @@ app.state.limiter = limiter
 # CORS Configuration - Allow frontend requests with wildcard support for Vercel
 # Pattern: https://*.vercel.app allows all Vercel preview and production deployments
 app.add_middleware(
-    CustomCORSMiddleware,
+    CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
     allow_origin_regex=settings.ALLOWED_ORIGINS_REGEX,
     allow_credentials=True,
@@ -141,12 +141,6 @@ async def root():
         "health": "/health",
         "version": "1.0.0"
     }
-
-
-@app.options("/{full_path:path}")
-async def preflight_handler(full_path: str):
-    """Handle CORS preflight requests"""
-    return {"message": "CORS preflight OK"}
 
 
 if __name__ == "__main__":

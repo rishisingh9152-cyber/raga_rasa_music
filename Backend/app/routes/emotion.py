@@ -54,7 +54,10 @@ def get_emotion_detector_lazy():
 async def detect_with_local_emotion_module(image_base64: str):
     """Use in-process local emotion_recognition module (no separate server)."""
     detector = get_local_emotion_detector()
-    emotion_raw, confidence, _ = await asyncio.to_thread(detector.detect_from_base64, image_base64)
+    emotion_raw, confidence, _ = await asyncio.wait_for(
+        asyncio.to_thread(detector.detect_from_base64, image_base64),
+        timeout=8.0,
+    )
     emotion_map = {
         "happy": "Happy",
         "neutral": "Neutral",
